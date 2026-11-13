@@ -1,0 +1,54 @@
+# stockhook_targets.txt
+# The Dwarf Fortress builds Stockhook's DLL may hook. Goes in the mod's
+# root folder, beside dfhooks_stockhook.dll; the installer copies both into
+# DF's folder, and the DLL reads this file there at launch.
+#
+# WHY: the hook assumes things about one DF build: where its stockpile
+# check is, which bytes start it, and where four of the item's methods sit
+# in its vtable. A DF update can change any of them, so a build is named by
+# the exe's PE timestamp and hooked only when it is either LISTED here (or
+# built into the DLL), or VERIFIED: for a build not listed, the DLL checks
+# at launch that the reference signatures are found exactly once, that the
+# item vtable read through DF's own RTTI is where the hook expects, and
+# that the check still calls the material slots (stockhook_dll.cpp, THE
+# AUTOMATIC TARGET). A build that is neither is left alone: stockpiles then
+# work exactly as DF's own, RM's fallback runs, and RM's prompt says so at
+# the fort load.
+#
+# WHEN TO ADD A LINE: only when the automatic checks refuse a build (its
+# reason is the last NOT HOOKING line in stockhook.log), or to skip the
+# checks: a verified build writes its own line into stockhook.log, ready
+# to paste here. A line here is the whole fix: no recompile.
+#
+# FORMAT, one build per line, numbers in hex, # starts a comment:
+#   build <PE timestamp> rva <function RVA> stolen <bytes the jump replaces>
+#   vt <getType> <getSubtype> <getMaterial> <getMaterialIndex> sig <bytes>
+# sig: the function's first bytes, ?? for any byte (never inside the stolen
+# bytes, which are copied as found). If the function moved, it is found by
+# a scan for sig, which must match exactly once. stockhook.log in DF's
+# folder names the build of the running exe, and says why it did or did
+# not hook.
+#
+# A line for a build the DLL already knows replaces the built-in values.
+#
+# THE COLOUR FUNCTION (optional, on the same line): crva, cstolen and csig
+# name the function DF colours each settings category with (red, grey,
+# green), the same way: where it is, how many bytes the jump replaces, its
+# first bytes. Hooked, it counts Stockhook's rows in a category's colour.
+# A line without them hooks the stockpile check alone; for a build the DLL
+# knows, its built-in colour target is used.
+
+# DF 53.16 Steam (also built into the DLL). stolen 13 is hex: 19 bytes;
+# cstolen F is 15. The ?? in csig are the stack cookie's address.
+build 6A70A6D9 rva 55E920 stolen 13 vt 0 8 10 18 sig 40 56 41 54 41 55 41 56 48 83 EC 28 41 C7 00 00 00 00 00 48 8B F1 48 8B 02 48 8B CA 45 0F B6 E9 crva 55A6D0 cstolen F csig 48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 55 41 54 41 55 41 56 41 57 48 8D AC 24 70 FF FF FF 48 81 EC 90 01 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 88 00 00 00 48 8B F9 33 DB 44 8B E3 89 5C 24 40 89 5C 24 44 45 32 F6 40 32 F6 83 FA 6C
+
+# DF 53.17 Steam (2026-11-09), read from the exe offline; the DLL's own
+# automatic checks, run against the same exe, write this line exactly.
+# Both functions moved and are otherwise unchanged at their starts: the 53.16 signatures
+# match exactly once each, so the stolen counts carry over, and the colour
+# signature's cmp edx, 6Ch shows no stockpile list was added. vt checked
+# against the item vtables themselves (item_barst, item_toolst,
+# item_boulderst, item_woodst, item_corpsest via RTTI: +0x00 returns the
+# item type constant, +0x08 the subtype, +0x10 the int16 mat_type, +0x18
+# the int32 mat_index) and against the check's own calls to +0x10, +0x18.
+build 6AEA05A1 rva 577E00 stolen 13 vt 0 8 10 18 sig 40 56 41 54 41 55 41 56 48 83 EC 28 41 C7 00 00 00 00 00 48 8B F1 48 8B 02 48 8B CA 45 0F B6 E9 crva 573BB0 cstolen F csig 48 89 5C 24 08 48 89 74 24 10 48 89 7C 24 18 55 41 54 41 55 41 56 41 57 48 8D AC 24 70 FF FF FF 48 81 EC 90 01 00 00 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 88 00 00 00 48 8B F9 33 DB 44 8B E3 89 5C 24 40 89 5C 24 44 45 32 F6 40 32 F6 83 FA 6C

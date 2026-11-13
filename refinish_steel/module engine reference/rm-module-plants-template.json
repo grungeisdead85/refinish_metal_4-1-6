@@ -1,0 +1,150 @@
+{
+    "_README": [
+        "==========================================",
+        "RM MODULE PLANTS TEMPLATE",
+        "==========================================",
+        "This file defines HOST PLANTS: plants that exist to carry materials.",
+        "DF only stores and lists some materials properly as plant materials,",
+        "dyes above all (guide section 4.1, On DYE).",
+        "",
+        "HOW TO USE THIS FILE:",
+        "  1. Copy it into your mod's data/ folder.",
+        "  2. Rename it to <yourmod>_plants.json.",
+        "  3. Change the module block below to your own prefix, name, version.",
+        "  4. Replace the plants array with your own content.",
+        "  5. Hand it to RM from your listener as plants_json, the way",
+        "     rm-module-template-advanced.lua hands over its files.",
+        "",
+        "THE UNDERSCORE CONVENTION:",
+        "  Any key starting with an underscore is documentation. RM's engine",
+        "  reads only the keys it knows about, so _README and _comment are",
+        "  ignored at load time. Keep them, edit them, or delete them.",
+        "",
+        "PREFIXING:",
+        "  You write keys. Plant key DYE_HOST under prefix MYMOD_ becomes the",
+        "  plant MYMOD_DYE_HOST. Its material MY_DYE is named everywhere by",
+        "  the token PLANT_MAT:MYMOD_DYE_HOST:MY_DYE, so write material keys",
+        "  WITHOUT the prefix. Reactions name these materials with mat_token.",
+        "",
+        "HOW A HOST IS BUILT:",
+        "  RM clones a donor plant for structure, resets the donor's own",
+        "  identity, writes your plant fields, then your materials. A host",
+        "  that declares no materials keeps its donor's, which preflight",
+        "  warns about.",
+        "",
+        "VALIDATION:",
+        "  RM's validator does not check this file. The plant injector guards",
+        "  each plant and logs what it could not do. Run preflight, which does",
+        "  check it.",
+        "",
+        "FULL FIELD DOCUMENTATION:",
+        "  RM_MODULE_ENGINE_README.md, section 7.2."
+    ],
+
+    "module": {
+        "_comment": "Identity block. Keep it the same as your other files: RM injects plants under the module's prefix, taken from your materials or reactions file.",
+        "prefix": "RM_TEMPLATE_",
+        "name": "RM Module Template",
+        "version": "1.0"
+    },
+
+    "plants": [
+
+        {
+            "_comment": "REFERENCE ENTRY. Every field the schema accepts, on a plant and on one of its materials. Copy it, then delete the lines you do not need.",
+
+            "_comment_key": "Required. Uppercase, no spaces: it becomes part of a raw token. The plant's ID is prefix + key.",
+            "key": "REFERENCE_HOST",
+
+            "_comment_name": "The plant's own names. name is required by preflight.",
+            "name": "reference host",
+            "name_plural": "reference hosts",
+
+            "_comment_donor_plant": "Optional. The ID of the plant RM clones for structure. Leave it out and RM picks one.",
+
+            "_comment_plant_flags": "Optional. Plant flags by their DF names, each true or false, written after RM resets the donor. An unknown name is logged.",
+            "plant_flags": {},
+
+            "_comment_materials": "The host's materials, each with the fields below. Preflight requires at least one.",
+            "materials": [
+
+                {
+                    "_comment_key": "Required. Uppercase, no spaces, without your prefix. The material's token is PLANT_MAT:<plant ID>:<key>.",
+                    "key": "REFERENCE_DYE",
+
+                    "_comment_name": "name is required by preflight: it is what items of the material display. names overrides single states: solid, liquid, gas, powder, paste, pressed. Without names: name, molten <name>, boiling <name>, then name for the rest.",
+                    "name": "reference dye",
+                    "names": {
+                        "solid": "reference dye",
+                        "powder": "reference dye"
+                    },
+
+                    "_comment_class": "Optional. The flag preset: METAL, STONE, GEM, CERAMIC, GLASS, SOIL, LIQUID, DYE or RAW (guide section 4.1). A dye uses DYE.",
+                    "material_class": "DYE",
+
+                    "_comment_color": "Set it. A descriptor colour ID: the material's colour (guide section 4.3). fallback_colors are tried in order when it is not loaded. A plant material with neither loaded takes descriptor colour 7.",
+                    "color": "COBALT",
+                    "fallback_colors": ["BLUE", "DARK_BLUE"],
+
+                    "_comment_dye_color": "Optional, DYE only. A descriptor colour ID to dye with, when it should not be the material's own colour. One that is not loaded is logged, and the material's own colour is used.",
+                    "dye_color": "COBALT",
+
+                    "_comment_ascii": "Optional. ASCII mode only: display_color colours the tile, build_color the constructions, each [foreground, background, brightness] from 0 to 7.",
+                    "display_color": [1, 0, 1],
+                    "build_color": [1, 0, 1],
+
+                    "_comment_value": "Optional. Material value.",
+                    "value": 2,
+
+                    "_comment_density": "Optional. Solid density, kg/m3.",
+                    "solid_density": 1000,
+
+                    "_comment_heat": "Optional, every field independently optional; null keeps the donor plant material's value. Urists: 10000 is freezing, 12000 is magma (guide section 4.4).",
+                    "heat": {
+                        "spec_heat": null,
+                        "melting_point": null,
+                        "boiling_point": null,
+                        "ignite_point": null,
+                        "heatdam_point": null,
+                        "colddam_point": null,
+                        "mat_fixed_temp": null
+                    },
+
+                    "_comment_strength": "Optional. yield, fracture and strain_at_yield, each with IMPACT, COMPRESSIVE, TENSILE, TORSION, SHEAR and BENDING, plus max_edge and absorption, as in the materials file (guide section 4.6).",
+                    "strength": {
+                        "max_edge": 0
+                    },
+
+                    "_comment_reaction_classes": "Optional. Tags reagents can ask for (guide section 4.5).",
+                    "reaction_classes": ["REFERENCE_DYESTUFF"],
+
+                    "_comment_graphics": "Optional. Sprites for the material's own slots: bar, boulder, wood, rough, cheese, texflag. Each is a source string or a table { donor, offset } (guide section 4.7). A slot does not take the material's colour on its own; a TINT: source draws registered art in it."
+                }
+            ]
+        },
+
+        {
+            "_comment": "EXAMPLE. A dye host carrying two dyes. Reactions make them with mat_token PLANT_MAT:RM_TEMPLATE_DYE_HOST:BLUE_DYE and PLANT_MAT:RM_TEMPLATE_DYE_HOST:RED_DYE.",
+
+            "key": "DYE_HOST",
+            "name": "dye host",
+            "name_plural": "dye hosts",
+            "materials": [
+                {
+                    "key": "BLUE_DYE",
+                    "name": "blue dye",
+                    "material_class": "DYE",
+                    "color": "BLUE",
+                    "fallback_colors": ["DARK_BLUE"]
+                },
+                {
+                    "key": "RED_DYE",
+                    "name": "red dye",
+                    "material_class": "DYE",
+                    "color": "RED",
+                    "fallback_colors": ["DARK_RED"]
+                }
+            ]
+        }
+    ]
+}

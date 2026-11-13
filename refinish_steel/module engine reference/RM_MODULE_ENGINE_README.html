@@ -1,0 +1,4756 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RM Module Guide</title>
+<!-- Generated from RM_MODULE_ENGINE_README.md by rm-docs-html.py. Edit the .md and run the
+     script again; changes made to this file are lost on the next run. -->
+<style>
+:root {
+  --paper:      #e6e7e2;
+  --surface:    #f2f3ef;
+  --surface-2:  #dcded7;
+  --ink:        #16181a;
+  --ink-soft:   #565c63;
+  --ink-faint:  #858b91;
+  --rule:       #c6c9c1;
+  --rule-soft:  #d6d8d1;
+
+  /* Dwarf Fortress 16-colour palette, used semantically */
+  --df-cyan:    #00696b;
+  --df-red:     #8c1010;
+  --df-green:   #14631f;
+  --df-brown:   #6f5d00;
+  --df-blue:    #1b2a72;
+
+  --mono: ui-monospace, "SFMono-Regular", "SF Mono", "Cascadia Mono",
+          "Roboto Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --body: "Iowan Old Style", "Palatino Linotype", Palatino, Charter,
+          "Bitstream Charter", Georgia, "Times New Roman", serif;
+
+  --rail: 300px;
+  --measure: 74ch;
+}
+
+html[data-theme="dark"] {
+  --paper:      #16181a;
+  --surface:    #1e2124;
+  --surface-2:  #2a2e32;
+  --ink:        #e4e6e1;
+  --ink-soft:   #a3a9ae;
+  --ink-faint:  #767c82;
+  --rule:       #343a3f;
+  --rule-soft:  #272c30;
+
+  --df-cyan:    #4fd6d8;
+  --df-red:     #f08a7a;
+  --df-green:   #79cc7f;
+  --df-brown:   #d6bc4a;
+  --df-blue:    #8fa8f5;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 1.5rem; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation: none !important; transition: none !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- LEFT RAIL ---------- */
+
+.rail {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: var(--rail);
+  background: var(--surface);
+  border-right: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+}
+
+.rail-head {
+  padding: 1.6rem 1.5rem 1.1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.rail-head .kicker {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--df-cyan);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.rail-head h1 {
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  margin: 0 0 0.45rem;
+}
+
+.rail-head p {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}
+
+.rail-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.9rem 0 2.5rem;
+  scrollbar-width: thin;
+}
+
+.rail-nav a {
+  display: flex;
+  gap: 0.7rem;
+  text-decoration: none;
+  color: var(--ink-soft);
+  font-family: var(--mono);
+  border-left: 2px solid transparent;
+}
+
+.nav-h2 {
+  padding: 0.5rem 1.5rem 0.5rem 1.4rem;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink) !important;
+  margin-top: 0.35rem;
+}
+
+.nav-h3 {
+  padding: 0.28rem 1.5rem 0.28rem 2.5rem;
+  font-size: 12px;
+}
+
+.rail-nav a .n {
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+  min-width: 1.9em;
+}
+
+.nav-h2 .n { color: var(--df-cyan); }
+
+.rail-nav a:hover {
+  background: var(--surface-2);
+  color: var(--ink) !important;
+}
+
+.rail-nav a.active {
+  border-left-color: var(--df-cyan);
+  background: var(--surface-2);
+  color: var(--ink) !important;
+}
+
+.rail-nav a.active .n { color: var(--df-cyan); }
+
+.rail-nav a.dim { opacity: 0.28; }
+
+.rail-nav a.unnumbered .n { color: var(--ink-faint); opacity: 0.55; }
+
+.nav-sub { margin-bottom: 0.2rem; }
+
+/* ---------- TOOLBAR ---------- */
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 0;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(var(--paper) 72%, transparent);
+}
+
+.search-wrap { position: relative; flex: 1; max-width: 30rem; }
+
+#search {
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 0.55rem 3.6rem 0.55rem 0.75rem;
+}
+
+#search::placeholder { color: var(--ink-faint); }
+
+#search:focus {
+  outline: 2px solid var(--df-cyan);
+  outline-offset: -1px;
+}
+
+.kbd {
+  position: absolute;
+  right: 0.5rem; top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-faint);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 0.1rem 0.32rem;
+  pointer-events: none;
+  background: var(--paper);
+}
+
+.tool-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 0.5rem 0.7rem;
+  cursor: pointer;
+}
+
+.tool-btn:hover { color: var(--ink); border-color: var(--ink-faint); }
+.tool-btn:focus-visible { outline: 2px solid var(--df-cyan); outline-offset: 1px; }
+
+#hits {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* ---------- MAIN ---------- */
+
+main {
+  margin-left: var(--rail);
+  padding: 0 3.5rem 8rem;
+  max-width: calc(var(--rail) + 62rem);
+}
+
+.chapter.hidden { display: none; }
+
+article > hr {
+  border: 0;
+  border-top: 1px solid var(--rule-soft);
+  margin: 3rem 0;
+}
+
+h2, h3 { position: relative; font-family: var(--mono); }
+
+h2 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 3.4rem 0 1.4rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 2px solid var(--ink);
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+}
+
+h3 {
+  font-size: 16.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 2.6rem 0 0.9rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+}
+
+h2 .h-num {
+  color: var(--df-cyan);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+
+h3 .h-num {
+  color: var(--df-cyan);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  flex: none;
+  min-width: 2.6em;
+}
+
+h4 {
+  font-family: var(--mono);
+  font-size: 14px;
+  margin: 2rem 0 0.7rem;
+}
+
+.anchor {
+  position: absolute;
+  left: -1.5rem;
+  color: var(--ink-faint);
+  text-decoration: none;
+  opacity: 0;
+  font-weight: 400;
+}
+
+h2:hover .anchor, h3:hover .anchor,
+.anchor:focus-visible { opacity: 1; }
+
+p, li { max-width: var(--measure); }
+
+p { margin: 0 0 1.1rem; }
+
+ul, ol { padding-left: 1.3rem; margin: 0 0 1.2rem; }
+li { margin-bottom: 0.5rem; }
+li > p { margin-bottom: 0.5rem; }
+
+strong { font-weight: 700; color: var(--ink); }
+
+a { color: var(--df-cyan); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { color: var(--ink); }
+
+/* Cross-references: the reason this document is worth reading in a
+   browser. Marked so they read as navigation, not emphasis. */
+.xref {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  font-variant-numeric: tabular-nums;
+  color: var(--df-cyan);
+  text-decoration: none;
+  border-bottom: 1px dashed currentColor;
+  padding-bottom: 1px;
+}
+
+.xref:hover { color: var(--ink); border-bottom-style: solid; }
+
+:target { animation: flash 1.4s ease-out; }
+@keyframes flash {
+  from { background: color-mix(in srgb, var(--df-cyan) 22%, transparent); }
+  to   { background: transparent; }
+}
+
+/* ---------- CODE ---------- */
+
+code {
+  font-family: var(--mono);
+  font-size: 0.855em;
+  background: var(--surface-2);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+  word-break: break-word;
+}
+
+.code {
+  position: relative;
+  margin: 0 0 1.4rem;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--df-blue);
+  border-radius: 2px;
+}
+
+.code::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0.45rem; left: 0.85rem;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.code pre {
+  margin: 0;
+  padding: 2rem 1rem 1rem;
+  overflow-x: auto;
+}
+
+.code code {
+  background: none;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.copy {
+  position: absolute;
+  top: 0.3rem; right: 0.35rem;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 0.2rem 0.45rem;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.code:hover .copy, .copy:focus-visible { opacity: 1; }
+.copy:hover { color: var(--ink); border-color: var(--ink-faint); }
+.copy.done { color: var(--df-green); border-color: var(--df-green); opacity: 1; }
+
+/* ---------- TABLES ---------- */
+
+.table-scroll { overflow-x: auto; margin: 0 0 1.5rem; }
+
+table {
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  width: 100%;
+  min-width: 32rem;
+}
+
+th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  border-bottom: 1.5px solid var(--ink);
+  padding: 0.5rem 0.9rem 0.5rem 0;
+  white-space: nowrap;
+}
+
+td {
+  border-bottom: 1px solid var(--rule-soft);
+  padding: 0.5rem 0.9rem 0.5rem 0;
+  vertical-align: top;
+}
+
+tbody tr:hover td { background: var(--surface); }
+
+td code { background: none; padding: 0; color: var(--df-blue); font-weight: 600; }
+
+table td:first-child { white-space: nowrap; }
+
+/* ---------- SEARCH HIGHLIGHT ---------- */
+
+mark {
+  background: color-mix(in srgb, var(--df-brown) 34%, transparent);
+  color: inherit;
+  border-radius: 1px;
+  padding: 0 1px;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+.rail-toggle { display: none; }
+
+@media (max-width: 1080px) {
+  :root { --rail: 260px; }
+  main { padding: 0 2rem 6rem; }
+}
+
+@media (max-width: 860px) {
+  .rail {
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    width: 280px;
+  }
+  .rail.open { transform: none; box-shadow: 0 0 40px rgba(0,0,0,0.25); }
+  main { margin-left: 0; padding: 0 1.15rem 5rem; }
+  .rail-toggle { display: inline-block; }
+  body { font-size: 16px; }
+  h2 { font-size: 22px; }
+  .toolbar { flex-wrap: wrap; }
+  #hits { order: 3; width: 100%; }
+}
+
+/* ---------- PRINT ---------- */
+
+@media print {
+  .rail, .toolbar, .copy, .anchor { display: none !important; }
+  main { margin: 0; padding: 0; max-width: none; }
+  body { background: #fff; color: #000; font-size: 10.5pt; }
+  .code { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+  a { color: #000; }
+}
+</style>
+</head>
+<body>
+
+<aside class="rail" id="rail">
+  <div class="rail-head">
+    <span class="kicker">Refinish Metal</span>
+    <h1>RM Module Guide</h1>
+    <p>Adding content to Dwarf Fortress at runtime</p>
+  </div>
+  <nav class="rail-nav">
+<a class="nav-h2" href="#sec-1" data-target="sec-1"><span class="n">1</span><span class="t">What this system is</span></a>
+<div class="nav-sub">
+<a class="nav-h3 unnumbered" href="#the-problem" data-target="the-problem"><span class="n">&middot;</span><span class="t">The problem</span></a>
+<a class="nav-h3 unnumbered" href="#what-rm-does-instead" data-target="what-rm-does-instead"><span class="n">&middot;</span><span class="t">What RM does instead</span></a>
+<a class="nav-h3 unnumbered" href="#what-this-does-not-mean" data-target="what-this-does-not-mean"><span class="n">&middot;</span><span class="t">What this does not mean</span></a>
+<a class="nav-h3 unnumbered" href="#what-you-write" data-target="what-you-write"><span class="n">&middot;</span><span class="t">What you write</span></a>
+<a class="nav-h3 unnumbered" href="#what-this-system-is-not-for" data-target="what-this-system-is-not-for"><span class="n">&middot;</span><span class="t">What this system is not for</span></a>
+</div>
+<a class="nav-h2" href="#sec-2" data-target="sec-2"><span class="n">2</span><span class="t">Anatomy of a module</span></a>
+<div class="nav-sub">
+<a class="nav-h3 unnumbered" href="#how-the-pieces-connect-at-runtime" data-target="how-the-pieces-connect-at-runtime"><span class="n">&middot;</span><span class="t">How the pieces connect at runtime</span></a>
+<a class="nav-h3 unnumbered" href="#the-prefix" data-target="the-prefix"><span class="n">&middot;</span><span class="t">The prefix</span></a>
+</div>
+<a class="nav-h2" href="#sec-3" data-target="sec-3"><span class="n">3</span><span class="t">Your first module</span></a>
+<div class="nav-sub">
+<a class="nav-h3 unnumbered" href="#step-1-infotxt" data-target="step-1-infotxt"><span class="n">&middot;</span><span class="t">Step 1: info.txt</span></a>
+<a class="nav-h3 unnumbered" href="#step-2-the-json-files" data-target="step-2-the-json-files"><span class="n">&middot;</span><span class="t">Step 2: the JSON files</span></a>
+<a class="nav-h3 unnumbered" href="#step-3-the-lua-file" data-target="step-3-the-lua-file"><span class="n">&middot;</span><span class="t">Step 3: the Lua file</span></a>
+<a class="nav-h3 unnumbered" href="#step-4-preflight" data-target="step-4-preflight"><span class="n">&middot;</span><span class="t">Step 4: preflight</span></a>
+<a class="nav-h3 unnumbered" href="#step-5-test-it" data-target="step-5-test-it"><span class="n">&middot;</span><span class="t">Step 5: test it</span></a>
+</div>
+<a class="nav-h2" href="#sec-4" data-target="sec-4"><span class="n">4</span><span class="t">The materials file</span></a>
+<div class="nav-sub">
+<a class="nav-h3" href="#sec-4-1" data-target="sec-4-1"><span class="n">4.1</span><span class="t">Material classes</span></a>
+<a class="nav-h3" href="#sec-4-2" data-target="sec-4-2"><span class="n">4.2</span><span class="t">Why "null" is not "zero"</span></a>
+<a class="nav-h3" href="#sec-4-3" data-target="sec-4-3"><span class="n">4.3</span><span class="t">Colour</span></a>
+<a class="nav-h3" href="#sec-4-4" data-target="sec-4-4"><span class="n">4.4</span><span class="t">Temperatures</span></a>
+<a class="nav-h3" href="#sec-4-5" data-target="sec-4-5"><span class="n">4.5</span><span class="t">Reaction classes and reaction products</span></a>
+<a class="nav-h3" href="#sec-4-6" data-target="sec-4-6"><span class="n">4.6</span><span class="t">Strength</span></a>
+<a class="nav-h3" href="#sec-4-7" data-target="sec-4-7"><span class="n">4.7</span><span class="t">Graphics</span></a>
+</div>
+<a class="nav-h2" href="#sec-5" data-target="sec-5"><span class="n">5</span><span class="t">The reactions file</span></a>
+<div class="nav-sub">
+<a class="nav-h3" href="#sec-5-1" data-target="sec-5-1"><span class="n">5.1</span><span class="t">Reaction fields</span></a>
+<a class="nav-h3" href="#sec-5-2" data-target="sec-5-2"><span class="n">5.2</span><span class="t">Buildings</span></a>
+<a class="nav-h3" href="#sec-5-3" data-target="sec-5-3"><span class="n">5.3</span><span class="t">Skills</span></a>
+<a class="nav-h3" href="#sec-5-4" data-target="sec-5-4"><span class="n">5.4</span><span class="t">Categories</span></a>
+<a class="nav-h3" href="#sec-5-5" data-target="sec-5-5"><span class="n">5.5</span><span class="t">Permissions</span></a>
+</div>
+<a class="nav-h2" href="#sec-6" data-target="sec-6"><span class="n">6</span><span class="t">Reagents and products in depth</span></a>
+<div class="nav-sub">
+<a class="nav-h3" href="#sec-6-1" data-target="sec-6-1"><span class="n">6.1</span><span class="t">Codes are local, material IDs are global</span></a>
+<a class="nav-h3" href="#sec-6-2" data-target="sec-6-2"><span class="n">6.2</span><span class="t">Reagent fields</span></a>
+<a class="nav-h3" href="#sec-6-3" data-target="sec-6-3"><span class="n">6.3</span><span class="t">Choosing a reagent type</span></a>
+<a class="nav-h3" href="#sec-6-4" data-target="sec-6-4"><span class="n">6.4</span><span class="t">The container pattern</span></a>
+<a class="nav-h3" href="#sec-6-5" data-target="sec-6-5"><span class="n">6.5</span><span class="t">The four ways a product picks its material</span></a>
+<a class="nav-h3" href="#sec-6-6" data-target="sec-6-6"><span class="n">6.6</span><span class="t">Product options</span></a>
+<a class="nav-h3" href="#sec-6-7" data-target="sec-6-7"><span class="n">6.7</span><span class="t">Improvement products</span></a>
+<a class="nav-h3" href="#sec-6-8" data-target="sec-6-8"><span class="n">6.8</span><span class="t">The magnifying glass</span></a>
+<a class="nav-h3" href="#sec-6-9" data-target="sec-6-9"><span class="n">6.9</span><span class="t">One more trap: economic stone</span></a>
+<a class="nav-h3" href="#sec-6-10" data-target="sec-6-10"><span class="n">6.10</span><span class="t">Naming any material: mat_token</span></a>
+</div>
+<a class="nav-h2" href="#sec-7" data-target="sec-7"><span class="n">7</span><span class="t">Tools, plants and buildings</span></a>
+<div class="nav-sub">
+<a class="nav-h3" href="#sec-7-1" data-target="sec-7-1"><span class="n">7.1</span><span class="t">Tools</span></a>
+<a class="nav-h3" href="#sec-7-2" data-target="sec-7-2"><span class="n">7.2</span><span class="t">Plants</span></a>
+<a class="nav-h3" href="#sec-7-3" data-target="sec-7-3"><span class="n">7.3</span><span class="t">Buildings</span></a>
+</div>
+<a class="nav-h2" href="#sec-8" data-target="sec-8"><span class="n">8</span><span class="t">The advanced Lua shell</span></a>
+<div class="nav-sub">
+<a class="nav-h3" href="#sec-8-1" data-target="sec-8-1"><span class="n">8.1</span><span class="t">The listener contract</span></a>
+<a class="nav-h3" href="#sec-8-2" data-target="sec-8-2"><span class="n">8.2</span><span class="t">Raw dependency checks</span></a>
+<a class="nav-h3" href="#sec-8-3" data-target="sec-8-3"><span class="n">8.3</span><span class="t">Computing values</span></a>
+<a class="nav-h3" href="#sec-8-4" data-target="sec-8-4"><span class="n">8.4</span><span class="t">Resolving materials at runtime</span></a>
+<a class="nav-h3" href="#sec-8-5" data-target="sec-8-5"><span class="n">8.5</span><span class="t">Helper scripts</span></a>
+</div>
+<a class="nav-h2" href="#sec-9" data-target="sec-9"><span class="n">9</span><span class="t">Working with other modules</span></a>
+<div class="nav-sub">
+<a class="nav-h3 unnumbered" href="#the-rule" data-target="the-rule"><span class="n">&middot;</span><span class="t">The rule</span></a>
+<a class="nav-h3 unnumbered" href="#the-mechanism" data-target="the-mechanism"><span class="n">&middot;</span><span class="t">The mechanism</span></a>
+<a class="nav-h3 unnumbered" href="#depends_on" data-target="depends_on"><span class="n">&middot;</span><span class="t">depends_on</span></a>
+<a class="nav-h3 unnumbered" href="#rms-catalog-requires" data-target="rms-catalog-requires"><span class="n">&middot;</span><span class="t">RM's catalog: requires</span></a>
+<a class="nav-h3 unnumbered" href="#rms-services" data-target="rms-services"><span class="n">&middot;</span><span class="t">RM's services</span></a>
+</div>
+<a class="nav-h2" href="#sec-10" data-target="sec-10"><span class="n">10</span><span class="t">Troubleshooting</span></a>
+<div class="nav-sub">
+<a class="nav-h3 unnumbered" href="#module-never-appears-in-the-log" data-target="module-never-appears-in-the-log"><span class="n">&middot;</span><span class="t">Module never appears in the log</span></a>
+<a class="nav-h3 unnumbered" href="#rejected-omitted-and-left-out" data-target="rejected-omitted-and-left-out"><span class="n">&middot;</span><span class="t">"Rejected", "Omitted" and "left out"</span></a>
+<a class="nav-h3 unnumbered" href="#prefix-overlaps" data-target="prefix-overlaps"><span class="n">&middot;</span><span class="t">"prefix overlaps"</span></a>
+<a class="nav-h3 unnumbered" href="#material-is-the-wrong-colour" data-target="material-is-the-wrong-colour"><span class="n">&middot;</span><span class="t">Material is the wrong colour</span></a>
+<a class="nav-h3 unnumbered" href="#reaction-appears-but-never-starts" data-target="reaction-appears-but-never-starts"><span class="n">&middot;</span><span class="t">Reaction appears but never starts</span></a>
+<a class="nav-h3 unnumbered" href="#reaction-does-not-appear-at-all" data-target="reaction-does-not-appear-at-all"><span class="n">&middot;</span><span class="t">Reaction does not appear at all</span></a>
+<a class="nav-h3 unnumbered" href="#reaction-eats-the-wrong-thing" data-target="reaction-eats-the-wrong-thing"><span class="n">&middot;</span><span class="t">Reaction eats the wrong thing</span></a>
+<a class="nav-h3 unnumbered" href="#diagnostics" data-target="diagnostics"><span class="n">&middot;</span><span class="t">Diagnostics</span></a>
+</div>
+<a class="nav-h2" href="#sec-11" data-target="sec-11"><span class="n">11</span><span class="t">Rules and conventions</span></a>
+<div class="nav-sub">
+<a class="nav-h3 unnumbered" href="#hard-rules" data-target="hard-rules"><span class="n">&middot;</span><span class="t">Hard rules</span></a>
+<a class="nav-h3 unnumbered" href="#naming" data-target="naming"><span class="n">&middot;</span><span class="t">Naming</span></a>
+<a class="nav-h3 unnumbered" href="#content" data-target="content"><span class="n">&middot;</span><span class="t">Content</span></a>
+<a class="nav-h3 unnumbered" href="#reference-files" data-target="reference-files"><span class="n">&middot;</span><span class="t">Reference files</span></a>
+</div>
+<a class="nav-h2" href="#appendix-a" data-target="appendix-a"><span class="n">A</span><span class="t">Every reagent type</span></a>
+<a class="nav-h2" href="#appendix-b" data-target="appendix-b"><span class="n">B</span><span class="t">Vectors and tool uses</span></a>
+  </nav>
+</aside>
+
+<main>
+  <div class="toolbar">
+    <button class="tool-btn rail-toggle" id="railToggle" type="button"
+            aria-label="Toggle contents">Contents</button>
+    <div class="search-wrap">
+      <input id="search" type="search" autocomplete="off" spellcheck="false"
+             placeholder="Filter the guide" aria-label="Filter the guide">
+      <span class="kbd">/</span>
+    </div>
+    <span id="hits" role="status" aria-live="polite"></span>
+    <button class="tool-btn" id="themeBtn" type="button">Dark</button>
+  </div>
+
+  <article id="doc">
+<p>How to add materials, reactions, tools, plants and buildings to Dwarf Fortress
+using Refinish Metal's module system.</p>
+<hr>
+<section class="chapter"><h2 id="sec-1" data-num="1"><a class="anchor" href="#sec-1" aria-label="Link to this section">#</a><span class="h-num">1</span><span class="h-text">What this system is</span></h2>
+<h3 id="the-problem"><a class="anchor" href="#the-problem" aria-label="Link to this heading">#</a>The problem</h3>
+<p>Dwarf Fortress reads raw files once, when a world is generated. Materials and
+reactions added afterwards do not exist in that world. Adding content to an
+existing save means regenerating the world, and removing a mod from a save
+corrupts it.</p>
+<h3 id="what-rm-does-instead"><a class="anchor" href="#what-rm-does-instead" aria-label="Link to this heading">#</a>What RM does instead</h3>
+<p>Refinish Metal writes content directly into the game's memory at load time,
+after the world is already open, and sweeps it back out before the game saves.
+Nothing your module injects (materials, reactions, categories, tools, plants,
+building definitions) is written into the save.</p>
+<p>That gives you two things raws cannot:</p>
+<ul>
+<li><strong>Content works on existing saves.</strong> No regeneration.</li>
+<li><strong>Nothing has to be decided at worldgen.</strong> Your module can read the loaded
+world and adapt to it.</li>
+</ul>
+<h3 id="what-this-does-not-mean"><a class="anchor" href="#what-this-does-not-mean" aria-label="Link to this heading">#</a>What this does not mean</h3>
+<p><strong>A module cannot be fully uninstalled from a save.</strong> This is worth being
+precise about, because the distinction is easy to overstate.</p>
+<p>Your module is still a DF mod. Once it is active for a world, DF records it in
+that save's mod list and keeps its <code>info.txt</code>, exactly as it does for RM itself.
+Delete the mod from disk and the save loses a mod it expects to find.</p>
+<p>What RM's approach actually buys is that <strong>the injected content is not part of
+the save</strong>. That is what makes existing saves usable and what stops a
+half-removed mod from corrupting one. It is not the same as leaving no trace.</p>
+<p>The realistic lifecycle is <strong>dormancy, not removal</strong>. A module that stops
+responding to RM's token call injects nothing, and the save continues to work
+without its materials. The mod entry stays. Design for that: assume a player
+may turn your content off, and make sure nothing you leave behind depends on it
+coming back.</p>
+<h3 id="what-you-write"><a class="anchor" href="#what-you-write" aria-label="Link to this heading">#</a>What you write</h3>
+<p>A module is one small Lua file and the JSON data files it points RM at: a
+materials file and a reactions file, plus, when you need them, a tools file, a
+plants file and a buildings file. Every JSON file goes in the module's <code>data</code>
+folder, and the PNG sheets they name go in an <code>images</code> folder inside <code>data</code>.
+You do not write engine code. You describe your content in a schema, and RM
+builds it.</p>
+<h3 id="what-this-system-is-not-for"><a class="anchor" href="#what-this-system-is-not-for" aria-label="Link to this heading">#</a>What this system is not for</h3>
+<p>RM adds content. It does not remove or rewrite content that already exists:
+if you need to change a vanilla material or delete a vanilla reaction, that
+still belongs in raw files. The one edit RM offers on existing materials is a
+reaction class given at run time and taken back before every save, through its
+material classes service (section <a class="xref" href="#sec-9">9</a>, RM's services).</p>
+</section>
+<hr>
+<section class="chapter"><h2 id="sec-2" data-num="2"><a class="anchor" href="#sec-2" aria-label="Link to this section">#</a><span class="h-num">2</span><span class="h-text">Anatomy of a module</span></h2>
+<div class="code" data-lang="text"><button class="copy" type="button">copy</button><pre><code class="">my_module/
+  info.txt
+  scripts_modinstalled/
+    my_module.lua
+  data/
+    my_module_materials.json
+    my_module_reactions.json
+    my_module_tools.json
+    my_module_plants.json
+    my_module_buildings.json
+    images/
+      my_module_sheet.png
+</code></pre></div>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>File</th>
+<th>What it holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>info.txt</code></td>
+<td>Standard DF mod metadata</td>
+</tr>
+<tr>
+<td><code>scripts_modinstalled/my_module.lua</code></td>
+<td>Registers with RM and points it at the JSON</td>
+</tr>
+<tr>
+<td><code>data/my_module_materials.json</code></td>
+<td>Your materials</td>
+</tr>
+<tr>
+<td><code>data/my_module_reactions.json</code></td>
+<td>Your reactions and categories</td>
+</tr>
+<tr>
+<td><code>data/my_module_tools.json</code></td>
+<td>Optional: your tools</td>
+</tr>
+<tr>
+<td><code>data/my_module_plants.json</code></td>
+<td>Optional: your host plants and the materials they carry</td>
+</tr>
+<tr>
+<td><code>data/my_module_buildings.json</code></td>
+<td>Optional: your workshops and furnaces</td>
+</tr>
+<tr>
+<td><code>data/images/</code></td>
+<td>Optional: the PNG sheets your JSON names</td>
+</tr>
+</tbody>
+</table></div>
+<p>Every JSON file goes in <code>data</code>, and <code>images</code> goes inside <code>data</code>. Image paths in
+your JSON are written relative to <code>data</code>, as <code>images/my_module_sheet.png</code>.</p>
+<h3 id="how-the-pieces-connect-at-runtime"><a class="anchor" href="#how-the-pieces-connect-at-runtime" aria-label="Link to this heading">#</a>How the pieces connect at runtime</h3>
+<ol>
+<li>DF loads a world. DFHack runs every script in <code>scripts_modinstalled/</code>.</li>
+<li>Your Lua file registers a <strong>listener</strong> with RM's module engine
+(<code>register_listener(name, callback, mod_id)</code>) and returns immediately.
+Nothing else happens yet.</li>
+<li>RM starts up and broadcasts a <strong>token call</strong> to every registered listener.
+A listener that gave a <code>mod_id</code> is only called when that mod is active in
+the loaded world. A <code>mod_id</code> that matches no installed mod is called anyway,
+with a warning to correct it.</li>
+<li>Your listener responds with your data, either as file paths or as already
+parsed tables (section <a class="xref" href="#sec-8-1">8.1</a>).</li>
+<li>RM validates the data one entry at a time. A bad material, reaction,
+category or tool is left out and named in the log, and the rest of your
+module still loads. The module is refused whole only when it cannot be
+identified or nothing valid is left (section <a class="xref" href="#sec-10">10</a>).</li>
+<li>RM injects modules in dependency order, RM's own catalog forms first. For
+each module, in this order: tools, plants, materials, your
+<code>on_materials_injected</code> function if you returned one, buildings,
+categories, reactions.</li>
+<li>Once every module is in: <code>reaction_products</code> that name other modules'
+materials are resolved, saved jobs on module reactions are pointed back at
+their reactions, and each accepted module's <code>start</code> function runs, if it
+returned one. Civilization permissions are granted after that, in RM's own
+startup.</li>
+<li>Before every save, at a shutdown and at the map unload, RM runs your <code>stop</code>
+function if it ran your <code>start</code>, then sweeps everything back out. After a
+save it injects again and runs <code>start</code> again.</li>
+</ol>
+<p>A refused module is never started: its <code>start</code> never runs, and the log says so
+under its name. That is why a module's scripts belong in <code>start</code> and never in
+the listener itself: the listener runs before validation, so a script started
+there keeps running for a module RM then refuses, and polls on through every
+save while the module's data is out of RAM. <code>start</code> and <code>stop</code> are optional.</p>
+<p>Registration is deliberately cheap. Your listener is a callback that is stored
+and called later, once the world raws exist. That ordering is why you cannot
+read <code>df.global.world</code> at the top of your Lua file.</p>
+<h3 id="the-prefix"><a class="anchor" href="#the-prefix" aria-label="Link to this heading">#</a>The prefix</h3>
+<p>Every module owns a <strong>prefix</strong>, a string ending in an underscore. RM stamps it
+onto everything you inject.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>You write</th>
+<th>RM creates</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>material key <code>GOLDBRONZE</code></td>
+<td>inorganic <code>MYMOD_GOLDBRONZE</code></td>
+</tr>
+<tr>
+<td>reaction key <code>MAKE_GOLDBRONZE</code></td>
+<td>reaction <code>MYMOD_RXN_MAKE_GOLDBRONZE</code></td>
+</tr>
+<tr>
+<td>category key <code>ALLOYS</code></td>
+<td>category <code>MYMOD_CAT_ALLOYS</code></td>
+</tr>
+<tr>
+<td>tool key <code>CRUCIBLE</code></td>
+<td>tool itemdef <code>MYMOD_CRUCIBLE</code></td>
+</tr>
+<tr>
+<td>plant key <code>DYE_HOST</code></td>
+<td>plant <code>MYMOD_DYE_HOST</code></td>
+</tr>
+<tr>
+<td>building key <code>KILNETTE</code></td>
+<td>building <code>MYMOD_KILNETTE</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The prefix is how RM tells your content apart from everyone else's, including
+during cleanup. Two rules follow from that:</p>
+<ul>
+<li><strong>No two modules may have overlapping prefixes.</strong> Not just identical ones.
+<code>THISMOD_</code> overlaps <code>THISMOD_TOO_</code>, because a sweep for the first also selects
+the second, and one module's shutdown would delete the other's materials.
+RM refuses the overlap at registration.</li>
+<li><strong><code>REFINISH_STEEL_</code> is reserved</strong> for RM's own finishes, and RM's own content
+registers through the same engine under <code>REFINISH_CORE_</code>, <code>REFINISH_BRICK_</code>,
+<code>REFINISH_DYE_</code> and the catalog prefixes (<code>REFINISH_GRAVEL_</code> and the rest,
+section <a class="xref" href="#sec-9">9</a>). The overlap rule keeps you off all of them. Do not start a prefix
+with <code>REFINISH_</code>.</li>
+</ul>
+<p>Pick something specific. <code>MYMOD_</code> is fine. <code>METAL_</code> is asking for trouble.</p>
+</section>
+<hr>
+<section class="chapter"><h2 id="sec-3" data-num="3"><a class="anchor" href="#sec-3" aria-label="Link to this section">#</a><span class="h-num">3</span><span class="h-text">Your first module</span></h2>
+<h3 id="step-1-infotxt"><a class="anchor" href="#step-1-infotxt" aria-label="Link to this heading">#</a>Step 1: info.txt</h3>
+<p>Standard DF mod metadata. The <code>[ID:...]</code> value is the one that matters here,
+because your Lua file uses it to find your own folder on disk, and it is the
+<code>mod_id</code> your listener can pass so RM only calls it in worlds that have your
+mod.</p>
+<div class="code" data-lang="text"><button class="copy" type="button">copy</button><pre><code class="">[ID:my_module]
+[NAME:My Module]
+[DESCRIPTION:Adds a new alloy.]
+[NUMERIC_VERSION:1]
+[DISPLAYED_VERSION:1.0]
+[EARLIEST_COMPATIBLE_NUMERIC_VERSION:1]
+[EARLIEST_COMPATIBLE_DISPLAYED_VERSION:1.0]
+[REQUIRES_ID:refinish_steel]
+[STEAM_TITLE:My Module]
+[STEAM_DESCRIPTION:Adds a new alloy.]
+</code></pre></div>
+<p><code>[REQUIRES_ID:refinish_steel]</code> declares the dependency on Refinish Metal
+itself. Every module needs this line. Your Lua file does nothing but register
+a listener, so without RM there to call it, the mod loads and then sits inert
+with no way for the player to tell why. Declaring the dependency puts that in
+front of them instead.</p>
+<h3 id="step-2-the-json-files"><a class="anchor" href="#step-2-the-json-files" aria-label="Link to this heading">#</a>Step 2: the JSON files</h3>
+<p>Copy <code>rm-module-materials-template.json</code> and
+<code>rm-module-reactions-template.json</code> into <code>data/</code>. Rename them. Change the
+<code>module</code> block in <strong>both</strong> files to your own prefix, name, and version.</p>
+<p>Tools, plants and buildings have templates of their own:
+<code>rm-module-tools-template.json</code>, <code>rm-module-plants-template.json</code> and
+<code>rm-module-buildings-template.json</code>. Each starts with a reference entry
+showing every field it accepts, annotated, then a short working example.</p>
+<p>The <code>module</code> block:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>prefix</code></td>
+<td>Yes</td>
+<td>Ends in an underscore. Must not contain <code>REFINISH_STEEL_</code>.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>Yes</td>
+<td>What the log calls your module.</td>
+</tr>
+<tr>
+<td><code>version</code></td>
+<td>Yes</td>
+<td>A non-empty string.</td>
+</tr>
+<tr>
+<td><code>depends_on</code></td>
+<td>No</td>
+<td>Prefixes of modules to inject before yours (section <a class="xref" href="#sec-9">9</a>).</td>
+</tr>
+<tr>
+<td><code>requires</code></td>
+<td>No</td>
+<td>RM catalog forms your module uses (section <a class="xref" href="#sec-9">9</a>).</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>prefix</code>, <code>name</code> and <code>version</code> are checked in the materials and the reactions
+file. The two prefixes must match, or RM refuses the module. The module's name
+and <code>depends_on</code> are read from the materials block first, then from the
+reactions block. <code>requires</code> is gathered from every file's block. A tools,
+plants or buildings file carries a <code>module</code> block too; a tools or buildings
+file can supply the prefix for a module that has no materials or reactions.</p>
+<h3 id="step-3-the-lua-file"><a class="anchor" href="#step-3-the-lua-file" aria-label="Link to this heading">#</a>Step 3: the Lua file</h3>
+<p>Copy <code>rm-module-template.lua</code> into <code>scripts_modinstalled/</code>, rename it, and set
+four values at the top:</p>
+<div class="code" data-lang="lua"><button class="copy" type="button">copy</button><pre><code class="language-lua">local MODULE_ID      = "my_module"                   -- from info.txt
+local MODULE_NAME    = "My Module"                   -- for log output
+local MATERIALS_FILE = "my_module_materials.json"
+local REACTIONS_FILE = "my_module_reactions.json"
+</code></pre></div>
+<p>That is the whole file. Everything below the configuration block is
+boilerplate you should not need to touch.</p>
+<p>Use <code>rm-module-template-advanced.lua</code> instead if you need to inspect or edit
+your data before RM sees it, start helper scripts, or ship tools, plants or
+buildings. Section <a class="xref" href="#sec-8">8</a> covers when that applies.</p>
+<h3 id="step-4-preflight"><a class="anchor" href="#step-4-preflight" aria-label="Link to this heading">#</a>Step 4: preflight</h3>
+<p><code>preflight.py</code> checks your JSON offline, without launching DF. It parses the
+type tables in <code>refinish-module-types.lua</code> rather than carrying its own copies,
+and it checks your files against the same rules as the engine's validator.</p>
+<p>Put the script, the types file and your JSON in one folder and run it:</p>
+<div class="code" data-lang="text"><button class="copy" type="button">copy</button><pre><code class="">preflight.py
+refinish-module-types.lua        copied from your RM install
+my_module_materials.json
+my_module_reactions.json
+</code></pre></div>
+<div class="code" data-lang="text"><button class="copy" type="button">copy</button><pre><code class="">python3 preflight.py
+</code></pre></div>
+<p>It finds <code>*_materials.json</code>, <code>*_reactions.json</code> and <code>*_reactions_*.json</code> on its
+own, and the optional <code>*_tools.json</code>, <code>*_plants.json</code> and <code>*_buildings.json</code>.
+Pass paths explicitly if you keep them elsewhere:</p>
+<div class="code" data-lang="text"><button class="copy" type="button">copy</button><pre><code class="">python3 preflight.py path/to/mats.json path/to/rxns.json --tools path/to/tools.json --plants path/to/plants.json --buildings path/to/buildings.json --types path/to/types.lua
+</code></pre></div>
+<p>Several reactions files may be passed after the materials file.</p>
+<p><strong>Errors fail the run. Warnings do not.</strong> An error is something the validator
+refuses: in game that entry is left out, or the whole module when the error is
+in its <code>module</code> block. A warning is either something the script cannot verify
+offline, or something legal that is a known way to shoot yourself: a colour with
+no fallback, a reaction with no skill, an <code>in_container</code> reagent with nothing
+declaring it contains it, a <code>to_container</code> bag that is not preserved, a dye
+declared as an inorganic.</p>
+<p>Warnings are grouped by kind with a count, because a large module can produce
+hundreds of the same one. <code>--verbose</code> prints them all. <code>--strict</code> makes them
+fail the run, which is useful in a build script.</p>
+<p>Beyond the validator, it also cross-checks references the engine resolves
+silently: a <code>mat_id</code> carrying your prefix that no material declares, a category
+written as the bare key where the full ID is required, a <code>PLANT_MAT:</code> token
+naming a plant or material your plants file does not declare, and tools,
+buildings and the image files they name. Those resolve to nothing in game and
+produce content that quietly matches nothing, which is the worst failure mode
+to debug from inside DF.</p>
+<p><strong>One thing to know about nulls.</strong> If you use the runtime resolution pattern
+(section <a class="xref" href="#sec-8-4">8.4</a>), write <code>"mat_id": null</code> explicitly rather than omitting the key.
+Preflight treats an explicit null as a deliberate sentinel and warns; it treats
+a missing key as a mistake and errors. That distinction is the only signal it
+has.</p>
+<p>Re-copy <code>refinish-module-types.lua</code> from your RM install whenever RM updates.
+Preflight is only as current as that file.</p>
+<h3 id="step-5-test-it"><a class="anchor" href="#step-5-test-it" aria-label="Link to this heading">#</a>Step 5: test it</h3>
+<p>Enable the mod, load a save, and open RM's log panel. You are looking for a line
+naming your module in RM's startup output. If anything was left out or the
+module was refused, the message names the exact field.</p>
+<p>Two things to know before you start iterating:</p>
+<ul>
+<li><strong>Restart fully between tests.</strong> Quit DF, clear the cache, relaunch. A
+partially reloaded script environment produces failures that have nothing to
+do with your change.</li>
+<li><strong><code>refinish-find</code> and <code>refinish-path</code></strong> are RM's diagnostic commands. Use
+them to confirm what actually landed in memory rather than assuming.</li>
+</ul>
+</section>
+<hr>
+<section class="chapter"><h2 id="sec-4" data-num="4"><a class="anchor" href="#sec-4" aria-label="Link to this section">#</a><span class="h-num">4</span><span class="h-text">The materials file</span></h2>
+<p>A material is one inorganic: a metal, a stone, a gem, a ceramic, a glass, a
+soil or a liquid.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">{
+    "module": { "prefix": "MYMOD_", "name": "My Module", "version": "1.0" },
+    "materials": [
+        { "key": "GOLDBRONZE", "name": "gold bronze", "material_class": "METAL" }
+    ]
+}
+</code></pre></div>
+<p>Three fields are required: <code>key</code>, <code>name</code>, <code>material_class</code>. <code>key</code> is uppercase
+with no spaces. Every field:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>key</code></td>
+<td>string</td>
+<td>Required. Uppercase, no spaces. Gets the prefix.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>string</td>
+<td>Required. The material's name in every state unless <code>names</code> says otherwise.</td>
+</tr>
+<tr>
+<td><code>material_class</code></td>
+<td>string</td>
+<td>Required. Section <a class="xref" href="#sec-4-1">4.1</a>.</td>
+</tr>
+<tr>
+<td><code>names</code></td>
+<td>table</td>
+<td>Optional per-state names: <code>solid</code>, <code>liquid</code>, <code>gas</code>, <code>powder</code>, <code>paste</code>, <code>pressed</code>. Defaults: <code>name</code>, <code>molten &lt;name&gt;</code>, <code>boiling &lt;name&gt;</code>, then <code>name</code> for the rest.</td>
+</tr>
+<tr>
+<td><code>color</code></td>
+<td>string</td>
+<td>A descriptor colour ID: the material's colour (section <a class="xref" href="#sec-4-3">4.3</a>).</td>
+</tr>
+<tr>
+<td><code>fallback_colors</code></td>
+<td>array</td>
+<td>Descriptor colour IDs tried in order when <code>color</code> is not loaded.</td>
+</tr>
+<tr>
+<td><code>liquid_color</code></td>
+<td>string</td>
+<td>A descriptor colour ID for the liquid state.</td>
+</tr>
+<tr>
+<td><code>gas_color</code></td>
+<td>string</td>
+<td>A descriptor colour ID for the gas state.</td>
+</tr>
+<tr>
+<td><code>dye_color</code></td>
+<td>string</td>
+<td>A descriptor colour ID: the colour a DYE material dyes with (section <a class="xref" href="#sec-4-1">4.1</a>).</td>
+</tr>
+<tr>
+<td><code>display_color</code></td>
+<td>array</td>
+<td>ASCII mode only: the colour of the material's tile, an ANSI triple.</td>
+</tr>
+<tr>
+<td><code>build_color</code></td>
+<td>array</td>
+<td>ASCII mode only: the colour of constructions built from it, an ANSI triple.</td>
+</tr>
+<tr>
+<td><code>tile</code></td>
+<td>number</td>
+<td>ASCII mode only: the code of the material's tile character.</td>
+</tr>
+<tr>
+<td><code>value</code></td>
+<td>number</td>
+<td>Material value.</td>
+</tr>
+<tr>
+<td><code>solid_density</code></td>
+<td>number</td>
+<td></td>
+</tr>
+<tr>
+<td><code>liquid_density</code></td>
+<td>number</td>
+<td></td>
+</tr>
+<tr>
+<td><code>molar_mass</code></td>
+<td>number</td>
+<td></td>
+</tr>
+<tr>
+<td><code>heat</code></td>
+<td>table</td>
+<td>Section <a class="xref" href="#sec-4-4">4.4</a>.</td>
+</tr>
+<tr>
+<td><code>strength</code></td>
+<td>table</td>
+<td>Section <a class="xref" href="#sec-4-6">4.6</a>.</td>
+</tr>
+<tr>
+<td><code>gem_names</code></td>
+<td>array</td>
+<td>Exactly two strings. Required when <code>material_class</code> is <code>GEM</code>.</td>
+</tr>
+<tr>
+<td><code>block_name</code></td>
+<td>array</td>
+<td>Exactly two strings, singular and plural: what blocks of this material are called (<code>["brick", "bricks"]</code> reads "fire clay bricks").</td>
+</tr>
+<tr>
+<td><code>stone_name</code></td>
+<td>string</td>
+<td>One string, already plural: what boulders of this material are called.</td>
+</tr>
+<tr>
+<td><code>soap_level</code></td>
+<td>number</td>
+<td></td>
+</tr>
+<tr>
+<td><code>reaction_classes</code></td>
+<td>array</td>
+<td>Section <a class="xref" href="#sec-4-5">4.5</a>.</td>
+</tr>
+<tr>
+<td><code>reaction_products</code></td>
+<td>array</td>
+<td>Section <a class="xref" href="#sec-4-5">4.5</a>.</td>
+</tr>
+<tr>
+<td><code>material_flags</code></td>
+<td>table</td>
+<td>Material flags to set or clear by name, applied over the class preset.</td>
+</tr>
+<tr>
+<td><code>inorganic_flags</code></td>
+<td>table</td>
+<td>Inorganic flags to set or clear by name.</td>
+</tr>
+<tr>
+<td><code>graphics</code></td>
+<td>table</td>
+<td>Sprite sources for the material's slots (section <a class="xref" href="#sec-4-7">4.7</a>).</td>
+</tr>
+<tr>
+<td><code>organic_category</code></td>
+<td>string</td>
+<td>Files the material in an organic stockpile category: <code>Glob</code>, <code>PlantPowder</code> or <code>CreatureCheese</code> (section <a class="xref" href="#sec-9">9</a>, RM's services).</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="sec-4-1" data-num="4.1"><a class="anchor" href="#sec-4-1" aria-label="Link to this section">#</a><span class="h-num">4.1</span><span class="h-text">Material classes</span></h3>
+<p><code>material_class</code> does two things: it picks which flags your material gets, and
+it tells RM what kind of existing material to clone for structure.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Produces</th>
+<th>Capabilities</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>METAL</code></td>
+<td>Bars</td>
+<td>Weapons, armour, ammo, diggers, anvils, furniture</td>
+</tr>
+<tr>
+<td><code>STONE</code></td>
+<td>Boulders</td>
+<td>Construction, furniture, quern stones</td>
+</tr>
+<tr>
+<td><code>CERAMIC</code></td>
+<td>Boulders</td>
+<td>Construction, furniture, tools. No weapons or armour</td>
+</tr>
+<tr>
+<td><code>GEM</code></td>
+<td>Rough gems</td>
+<td>Cutting, encrusting. Requires <code>gem_names</code></td>
+</tr>
+<tr>
+<td><code>GLASS</code></td>
+<td>Rough glass</td>
+<td>Construction, furniture, trap components, crafts. No weapons or armour</td>
+</tr>
+<tr>
+<td><code>SOIL</code></td>
+<td>Boulders</td>
+<td>Clears every metal, gem, ceramic and glass flag and every item capability, then sets <code>IS_STONE</code></td>
+</tr>
+<tr>
+<td><code>LIQUID</code></td>
+<td>Nothing solid</td>
+<td>Clears the same flags and capabilities, then sets <code>LIQUID_MISC_OTHER</code></td>
+</tr>
+<tr>
+<td><code>DYE</code></td>
+<td>Powder (<code>POWDER_MISC</code>)</td>
+<td>A dye every dye job takes. Declare it on a plant host, not as an inorganic (see <a class="xref" href="#sec-7-2">7.2</a>)</td>
+</tr>
+<tr>
+<td><code>RAW</code></td>
+<td>Nothing by default</td>
+<td>No preset at all. You set every flag yourself</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>On <code>GLASS</code>:</strong> vanilla's green, clear and crystal glass are builtin material
+types, not inorganics, so no vanilla world holds an <code>IS_GLASS</code> inorganic for RM
+to clone. RM falls back to a ceramic donor, and the <code>GLASS</code> preset then clears
+<code>IS_CERAMIC</code> and sets <code>IS_GLASS</code>. None of that is visible in play. The material
+is glass.</p>
+<p>Note that since glass is builtin, not inorganic, simply injecting a new glass
+material will not automatically populate the glass furnace with reactions,
+unlike inorganics such as smelted metals. Glass furnace reactions must be built
+individually the way vanilla builds glass: one reaction per material per item,
+at the glass furnace, taking sand straight through to the finished object.
+Vanilla has no green glass bar that gets worked afterwards, and your material
+does not need one either. The cost is volume, not difficulty: a full item
+range runs to roughly three dozen reactions per material.</p>
+<p><strong>On <code>DYE</code>:</strong> the preset sets <code>IS_DYE</code> and the two plant powder flags every
+vanilla dye carries, and RM writes the dye colour (<code>powder_dye</code>) from the
+material's colour, or from <code>dye_color</code> when you set it. Declare dyes on a plant
+host in your plants file (section <a class="xref" href="#sec-7-2">7.2</a>). DF files a powder by the type of its
+material: an inorganic dye is either stranded where it was made (with the plant
+flags) or stored as an empty bag under Furniture and listed nowhere (without
+them). Preflight warns when a dye is declared as an inorganic.</p>
+<p><strong>On <code>RAW</code>:</strong> no flags are cleared and none are set, so whatever RM cloned
+carries through untouched and <code>material_flags</code> is your only control. It exists
+for cases where the presets get in the way. If you are not sure you need it,
+you do not.</p>
+<h3 id="sec-4-2" data-num="4.2"><a class="anchor" href="#sec-4-2" aria-label="Link to this section">#</a><span class="h-num">4.2</span><span class="h-text">Why "null" is not "zero"</span></h3>
+<p>Every optional field accepts <code>null</code>, and <code>null</code> means <strong>do not write this
+field</strong>. The value from RM's clone donor stays in place.</p>
+<p>That donor is chosen at runtime by scanning the loaded world, so it can differ
+between worlds and between mod sets. A null density does not give you zero
+density. It gives you an unpredictable one.</p>
+<p>Write real numbers. The only field where null is routinely correct is <code>value</code>,
+and only when you are computing it in Lua (section <a class="xref" href="#sec-8-3">8.3</a>).</p>
+<h3 id="sec-4-3" data-num="4.3"><a class="anchor" href="#sec-4-3" aria-label="Link to this section">#</a><span class="h-num">4.3</span><span class="h-text">Colour</span></h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What it sets</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>color</code></td>
+<td>The material's colour, in every state unless <code>liquid_color</code> or <code>gas_color</code> says otherwise</td>
+<td>A descriptor colour ID</td>
+</tr>
+<tr>
+<td><code>fallback_colors</code></td>
+<td>Tried in order when <code>color</code> is not loaded in the world</td>
+<td>Descriptor colour IDs</td>
+</tr>
+<tr>
+<td><code>liquid_color</code>, <code>gas_color</code></td>
+<td>The liquid and gas states' colour</td>
+<td>A descriptor colour ID</td>
+</tr>
+<tr>
+<td><code>dye_color</code></td>
+<td>What a DYE material dyes with, when it should not be the material's own colour</td>
+<td>A descriptor colour ID</td>
+</tr>
+<tr>
+<td><code>display_color</code></td>
+<td>ASCII mode only: the colour of the material's tile</td>
+<td>ANSI triple, each 0 to 7</td>
+</tr>
+<tr>
+<td><code>build_color</code></td>
+<td>ASCII mode only: the colour of constructions built from it</td>
+<td>ANSI triple, each 0 to 7</td>
+</tr>
+<tr>
+<td><code>tile</code></td>
+<td>ASCII mode only: the material's tile character</td>
+<td>A character code</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"color": "METALLIC_BRONZE",
+"fallback_colors": ["BRONZE", "DARK_GOLD", "ORANGE"]
+</code></pre></div>
+<p><code>color</code> is the colour that matters in the graphical game. It is a descriptor
+colour ID from <code>descriptor_color_standard.txt</code> (or another mod's descriptor
+raws), matched case-insensitively against the colours loaded in that world.
+RM writes it as the material's state colour: the colour DF tints a sprite
+with where it tints one, and a dye's colour unless <code>dye_color</code> gives another.</p>
+<p><strong>An ID that is not loaded fails silently.</strong> RM tries <code>fallback_colors</code> in
+order, and if none of those is loaded either, the material takes descriptor
+colour 7, with no error printed anywhere. <code>fallback_colors</code> is the only
+protection you get. Always supply at least one. An unloaded <code>dye_color</code> is
+logged, and the material's own colour is used instead.</p>
+<p><code>display_color</code>, <code>build_color</code> and <code>tile</code> are ASCII-mode fields: the classic
+display draws a material's tile in its colour, and nothing in the graphical
+game reads them. RM writes <code>display_color</code> and <code>build_color</code> only together with
+<code>color</code>; when <code>color</code> is set and they are not, RM writes a default triple.</p>
+<p>If you use a colour ID your own raws half defines, verify it at load time. The
+advanced template has a <code>color_exists</code> helper for this.</p>
+<h3 id="sec-4-4" data-num="4.4"><a class="anchor" href="#sec-4-4" aria-label="Link to this section">#</a><span class="h-num">4.4</span><span class="h-text">Temperatures</span></h3>
+<p><code>heat</code> takes seven optional numbers: <code>spec_heat</code>, <code>melting_point</code>,
+<code>boiling_point</code>, <code>ignite_point</code>, <code>heatdam_point</code>, <code>colddam_point</code>,
+<code>mat_fixed_temp</code>.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"heat": { "spec_heat": 450, "melting_point": 12718, "boiling_point": 14877 }
+</code></pre></div>
+<p>DF temperatures are in urists, not degrees. The scale is Fahrenheit offset by
+9968, so 9968 U is 0 degrees F.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Reference point</th>
+<th>Urists</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Water freezes and ice melts</td>
+<td>10000</td>
+</tr>
+<tr>
+<td>Comfortable room temperature</td>
+<td>10036</td>
+</tr>
+<tr>
+<td>Water boils</td>
+<td>10180</td>
+</tr>
+<tr>
+<td>Magma</td>
+<td>12000</td>
+</tr>
+</tbody>
+</table></div>
+<p>The first row is the one to anchor on: 10000 is <strong>freezing</strong>, not room
+temperature. Vanilla <code>WATER</code> carries <code>MELTING_POINT:10000</code> and
+<code>BOILING_POINT:10180</code>, which is where those two numbers come from.</p>
+<p>Magma sits at 12000, so a material needs a melting point <strong>above</strong> 12000 to
+survive contact with it. Vanilla iron melts at 12718 and boils at 14877; those
+are useful reference points for positioning a metal.</p>
+<h3 id="sec-4-5" data-num="4.5"><a class="anchor" href="#sec-4-5" aria-label="Link to this section">#</a><span class="h-num">4.5</span><span class="h-text">Reaction classes and reaction products</span></h3>
+<p>These two fields are what let materials participate in chains without anyone
+hardcoding anything.</p>
+<p><strong><code>reaction_classes</code></strong> is a list of tags. A reagent can then say "accept
+anything carrying tag X" instead of naming materials. This is the only
+supported way for modules to interact. Section <a class="xref" href="#sec-9">9</a> covers it properly.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"reaction_classes": ["THERMALLY_PROCESSED", "CALCIUM_SILICATE"]
+</code></pre></div>
+<p>An empty array is meaningful and worth writing: it explicitly clears anything
+inherited from the clone donor.</p>
+<p><strong><code>reaction_products</code></strong> are named derivations. They answer the question "when a
+reaction asks this material for product X, what does it hand back?" Each entry
+needs <code>id</code> and <code>mat_id</code>.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"reaction_products": [
+    { "id": "FIRED_MAT", "mat_id": "MYMOD_STONEWARE" }
+]
+</code></pre></div>
+<p>This is how vanilla fires clay. The reaction does not name any clay. It says
+"any boulder that declares a FIRED_MAT product", and the output says "whatever
+that material's FIRED_MAT is." One reaction then handles every clay in the
+world, including clays from mods that have never heard of it.</p>
+<p><code>mat_id</code> must be the <strong>full prefixed ID</strong>. Cross-module references are resolved
+in a final pass after every module has injected, so they work in either
+direction, including between two modules that reference each other.</p>
+<h3 id="sec-4-6" data-num="4.6"><a class="anchor" href="#sec-4-6" aria-label="Link to this section">#</a><span class="h-num">4.6</span><span class="h-text">Strength</span></h3>
+<p><code>strength</code> takes three groups, <code>yield</code>, <code>fracture</code> and <code>strain_at_yield</code>, each
+with any of <code>IMPACT</code>, <code>COMPRESSIVE</code>, <code>TENSILE</code>, <code>TORSION</code>, <code>SHEAR</code> and
+<code>BENDING</code>, plus a single <code>max_edge</code> and a single <code>absorption</code> (how much a
+porous material such as clay or ceramic absorbs). Every value is a number or
+null.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"strength": {
+    "yield":    { "IMPACT": 1505, "COMPRESSIVE": 1505 },
+    "fracture": { "IMPACT": 2520, "COMPRESSIVE": 2520 },
+    "max_edge": 10000
+}
+</code></pre></div>
+<h3 id="sec-4-7" data-num="4.7"><a class="anchor" href="#sec-4-7" aria-label="Link to this section">#</a><span class="h-num">4.7</span><span class="h-text">Graphics</span></h3>
+<p><code>graphics</code> writes sprites into the material's own slots: <code>bar</code>, <code>boulder</code>,
+<code>wood</code>, <code>rough</code>, <code>cheese</code> and <code>texflag</code>. Each slot takes a source string, or a
+table with <code>donor</code> (a source string) and an optional <code>offset</code> (a number).</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"graphics": { "boulder": "PAGE:BOULDERS:1:15", "bar": { "donor": "INORGANIC:IRON#bar" } }
+</code></pre></div>
+<p>A source names where an existing sprite lives:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TEXPOS:&lt;n&gt;</code></td>
+<td>A literal texture position. Changes between sessions; debugging only</td>
+</tr>
+<tr>
+<td><code>TOOL:&lt;itemdef code&gt;</code></td>
+<td>A tool itemdef's sprite fields</td>
+</tr>
+<tr>
+<td><code>INFO:&lt;table&gt;:&lt;n&gt;</code></td>
+<td>An entry in one of DF's <code>*_graphics_info</code> tables</td>
+</tr>
+<tr>
+<td><code>PAGE:&lt;page&gt;:&lt;x&gt;:&lt;y&gt;</code></td>
+<td>A cell of a loaded tile page, by the coordinates the raws use</td>
+</tr>
+<tr>
+<td><code>FILE:&lt;path&gt;:&lt;x&gt;:&lt;y&gt;[:&lt;width&gt;]</code></td>
+<td>A cell of a PNG on disk, its path relative to your <code>data</code> folder (<code>images/...</code>). <code>&lt;width&gt;</code> is the sheet's width in tiles, for a sheet RM cannot measure on its own</td>
+</tr>
+<tr>
+<td><code>BUILTIN:&lt;material&gt;#&lt;slot&gt;</code></td>
+<td>A builtin material's slot</td>
+</tr>
+<tr>
+<td><code>INORGANIC:&lt;id&gt;#&lt;slot&gt;</code></td>
+<td>Any inorganic's slot</td>
+</tr>
+<tr>
+<td><code>TINT:&lt;art name&gt;</code></td>
+<td>Art registered with RM's sprite art, tinted to this material's colour</td>
+</tr>
+</tbody>
+</table></div>
+<p>A material slot does not take on the material's colour by itself: a sprite
+written there shows exactly as drawn. <code>TINT:</code> is how a material gets art in its
+own colour; the art is registered from Lua with <code>refinish-sprite-art</code>.</p>
+</section>
+<hr>
+<section class="chapter"><h2 id="sec-5" data-num="5"><a class="anchor" href="#sec-5" aria-label="Link to this section">#</a><span class="h-num">5</span><span class="h-text">The reactions file</span></h2>
+<p>A reaction is one job: what it consumes, what it makes, where it appears, who
+can do it.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">{
+    "module": { "prefix": "MYMOD_", "name": "My Module", "version": "1.0" },
+    "categories": [ ... ],
+    "reactions": [ ... ]
+}
+</code></pre></div>
+<h3 id="sec-5-1" data-num="5.1"><a class="anchor" href="#sec-5-1" aria-label="Link to this section">#</a><span class="h-num">5.1</span><span class="h-text">Reaction fields</span></h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>key</code></td>
+<td>Yes</td>
+<td>Unique in this file. Gets the prefix.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>Yes</td>
+<td>What the player reads. Lowercase, verb first.</td>
+</tr>
+<tr>
+<td><code>building</code></td>
+<td>Yes</td>
+<td>Where the job appears (section <a class="xref" href="#sec-5-2">5.2</a>).</td>
+</tr>
+<tr>
+<td><code>skill</code></td>
+<td>No, but set it</td>
+<td>What the worker trains (section <a class="xref" href="#sec-5-3">5.3</a>).</td>
+</tr>
+<tr>
+<td><code>fuel</code></td>
+<td>No</td>
+<td>Default false. True makes the job burn fuel; magma buildings are exempt.</td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>No</td>
+<td>The <strong>full prefixed</strong> category ID.</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>No</td>
+<td>Text shown in the task pane under the job's Produces and Requires lines. A string is one entry; an array is one entry per element.</td>
+</tr>
+<tr>
+<td><code>building_hotkey</code></td>
+<td>No</td>
+<td>The job's hotkey at its building, as a <code>df.interface_key</code> name. An unknown name is logged.</td>
+</tr>
+<tr>
+<td><code>permissions</code></td>
+<td>No</td>
+<td>Default AUTO. Which civilizations get it (section <a class="xref" href="#sec-5-5">5.5</a>).</td>
+</tr>
+<tr>
+<td><code>reaction_flags</code></td>
+<td>No</td>
+<td>Currently just <code>fortress_mode</code>.</td>
+</tr>
+<tr>
+<td><code>fallback_template</code></td>
+<td>No</td>
+<td>Override RM's structural donor choice.</td>
+</tr>
+<tr>
+<td><code>reagents</code></td>
+<td>Yes</td>
+<td>At least one. Codes must be unique within the reaction.</td>
+</tr>
+<tr>
+<td><code>products</code></td>
+<td>Yes</td>
+<td>At least one.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Always set <code>skill</code>.</strong> RM builds a reaction by cloning an existing one for its
+C++ structure, then zeroing every semantic field and rebuilding from your
+definition. If you omit <code>skill</code>, the donor's skill survives, and which donor
+got picked is not something you control.</p>
+<p><code>fallback_template</code> exists to override that donor choice by naming a vanilla
+reaction code. You almost certainly do not need it. The neutral reset means a
+suboptimal donor is a cosmetic issue, not a functional one.</p>
+<h3 id="sec-5-2" data-num="5.2"><a class="anchor" href="#sec-5-2" aria-label="Link to this section">#</a><span class="h-num">5.2</span><span class="h-text">Buildings</span></h3>
+<p>All twenty-two entries in <code>BUILDING_TYPES</code>:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Building</th>
+<th>Type and subtype</th>
+<th>Custom code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>WOOD_FURNACE</code></td>
+<td>Wood furnace</td>
+<td>type {5}, subtype {0}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>SMELTER</code></td>
+<td>Smelter and magma smelter</td>
+<td>type {5, 5}, subtype {1, 4}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>GLASS_FURNACE</code></td>
+<td>Glass furnace and magma glass furnace</td>
+<td>type {5, 5}, subtype {2, 5}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>KILN</code></td>
+<td>Kiln and magma kiln</td>
+<td>type {5, 5}, subtype {3, 6}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>MASON</code></td>
+<td>Mason's workshop</td>
+<td>type {13}, subtype {2}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CRAFTSMAN</code></td>
+<td>Craftsdwarf's workshop</td>
+<td>type {13}, subtype {3}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>JEWELER</code></td>
+<td>Jeweler's workshop</td>
+<td>type {13}, subtype {4}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>FORGE</code></td>
+<td>Metalsmith's forge and magma forge</td>
+<td>type {13, 13}, subtype {5, 6}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>MECHANIC</code></td>
+<td>Mechanic's workshop</td>
+<td>type {13}, subtype {8}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>STILL</code></td>
+<td>Still</td>
+<td>type {13}, subtype {15}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>FARMERS</code></td>
+<td>Farmer's workshop</td>
+<td>type {13}, subtype {1}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>KITCHEN</code></td>
+<td>Kitchen</td>
+<td>type {13}, subtype {19}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>MILL</code></td>
+<td>Quern and millstone</td>
+<td>type {13, 13}, subtype {17, 22}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ASHERY</code></td>
+<td>Ashery</td>
+<td>type {13}, subtype {20}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>DYER</code></td>
+<td>Dyer's shop</td>
+<td>type {13}, subtype {21}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>TANNER</code></td>
+<td>Tanner's shop</td>
+<td>type {13}, subtype {12}</td>
+<td></td>
+</tr>
+<tr>
+<td><code>SOAP_MAKER</code></td>
+<td>Soap maker's workshop (vanilla, built as a custom workshop)</td>
+<td>type {13}, subtype {23}</td>
+<td><code>SOAP_MAKER</code></td>
+</tr>
+<tr>
+<td><code>SCREW_PRESS</code></td>
+<td>Screw press (vanilla, built as a custom workshop)</td>
+<td>type {13}, subtype {23}</td>
+<td><code>SCREW_PRESS</code></td>
+</tr>
+<tr>
+<td><code>CHEMIST</code></td>
+<td>ArgMOD's chemist; needs ArgMOD's raws</td>
+<td>type {13}, subtype {23}</td>
+<td><code>CHEMIST</code></td>
+</tr>
+<tr>
+<td><code>COMPOUNDER</code></td>
+<td>ArgMOD's compounder; needs ArgMOD's raws</td>
+<td>type {13}, subtype {23}</td>
+<td><code>COMPOUNDER</code></td>
+</tr>
+<tr>
+<td><code>RETORT</code></td>
+<td>Making Fuel's retort, a custom furnace; needs Making Fuel</td>
+<td>type {5}, subtype {7}</td>
+<td><code>MAKING_FUEL_RETORT</code></td>
+</tr>
+<tr>
+<td><code>NONE</code></td>
+<td>No building</td>
+<td>none</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>Magma variants are automatic. You do not write two reactions.</p>
+<p>A custom workshop or furnace is a raw object rather than an enum entry, so RM
+finds it by <code>custom_code</code> at build time, because its index shifts with mod load
+order. A reaction assigned to one that is not installed has nowhere to appear
+and vanishes without comment, so check for it (section <a class="xref" href="#sec-8-2">8.2</a>).</p>
+<p>To put reactions in a workshop or furnace of your own, including one your
+buildings file injects (section <a class="xref" href="#sec-7-3">7.3</a>), add an entry to <code>BUILDING_TYPES</code> in
+<code>refinish-module-types.lua</code>: type <code>{ 13 }</code>, subtype <code>{ 23 }</code> for a workshop or
+type <code>{ 5 }</code>, subtype <code>{ 7 }</code> for a furnace, <code>custom = { -1 }</code>, and
+<code>custom_code</code> naming the building's full code.</p>
+<h3 id="sec-5-3" data-num="5.3"><a class="anchor" href="#sec-5-3" aria-label="Link to this section">#</a><span class="h-num">5.3</span><span class="h-text">Skills</span></h3>
+<p>All thirty-six entries in <code>SKILL_MAP</code>:</p>
+<p><code>WOOD_BURNING</code>, <code>SMELT</code>, <code>GLASSMAKER</code>, <code>POTTERY</code>, <code>CHEMISTRY</code>, <code>MASONRY</code>, <code>STONECRAFT</code>, <code>KNAPPING</code>, <code>CUT_STONE</code>, <code>CARVE_STONE</code>, <code>FORGE_WEAPON</code>, <code>FORGE_ARMOR</code>, <code>FORGE_FURNITURE</code>, <code>METALCRAFT</code>, <code>GEM_CUTTING</code>, <code>GEM_SETTING</code>, <code>WOODCRAFT</code>, <code>BONECARVE</code>, <code>LEATHERWORK</code>, <code>TANNER</code>, <code>CARPENTRY</code>, <code>MECHANICS</code>, <code>BREWING</code>, <code>COOK</code>, <code>PLANT</code>, <code>WEAVING</code>, <code>CLOTHESMAKING</code>, <code>STRAND_EXTRACT</code>, <code>SOAP_MAKING</code>, <code>MILLING</code>, <code>LYE_MAKING</code>, <code>PRESSING</code>, <code>PAPERMAKING</code>, <code>GLAZING</code>, <code>POTASH_MAKING</code>, <code>PROCESSPLANTS</code></p>
+<p>Match the skill to the building. A <code>SMELT</code> reaction at a mason's workshop will
+inject and run, but the wrong dwarves will be assigned to it.</p>
+<h3 id="sec-5-4" data-num="5.4"><a class="anchor" href="#sec-5-4" aria-label="Link to this section">#</a><span class="h-num">5.4</span><span class="h-text">Categories</span></h3>
+<p>Categories are the collapsible headings in a workshop's job list. Optional.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"categories": [
+    { "key": "ALLOYS", "name": "Alloys", "parent": "" },
+    { "key": "BRONZES", "name": "Bronzes", "parent": "ALLOYS" }
+]
+</code></pre></div>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>key</code></td>
+<td>Yes</td>
+<td>Unique in this file. Becomes <code>&lt;prefix&gt;CAT_&lt;key&gt;</code>.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>Yes</td>
+<td>The folder's caption.</td>
+</tr>
+<tr>
+<td><code>parent</code></td>
+<td>Yes</td>
+<td>An empty string means top level. A child names its parent's <strong>bare key</strong>, unprefixed.</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>No</td>
+<td>A string.</td>
+</tr>
+<tr>
+<td><code>hotkey</code></td>
+<td>No</td>
+<td>A string.</td>
+</tr>
+</tbody>
+</table></div>
+<p>There is one asymmetry worth memorising: a reaction's <code>category</code> field takes
+the <strong>full prefixed ID</strong>, not the bare key.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"category": "MYMOD_CAT_BRONZES"
+</code></pre></div>
+<p>Naming a category your module does not declare leaves the string alone, which
+is how you nest under a category that already exists.</p>
+<h3 id="sec-5-5" data-num="5.5"><a class="anchor" href="#sec-5-5" aria-label="Link to this section">#</a><span class="h-num">5.5</span><span class="h-text">Permissions</span></h3>
+<p>Permissions decide which <strong>civilizations</strong> know the reaction. This affects what
+caravans bring, what invaders carry, and what other sites produce. It is not
+about your fortress.</p>
+<p><strong><code>AUTO</code></strong> (the default) evaluates every civilization and grants the reaction to
+any that can operate the building (its capability gate in
+<code>BUILDING_CAPABILITY_GATES</code>) and knows the metals the reaction works. A civ that
+cannot smelt does not receive smelting reactions. This is right for ordinary
+content.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"permissions": { "mode": "AUTO" }
+</code></pre></div>
+<p><strong><code>ENTITY_CODE</code></strong> grants only to the entity codes you name, in a non-empty
+<code>entities</code> array. The same capability gate still applies on top, so naming a
+civ that cannot use the building does not force it through. Codes are whatever
+is loaded, vanilla or modded. <code>entities</code> is refused with any other mode.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"permissions": { "mode": "ENTITY_CODE", "entities": ["MOUNTAIN", "PLAINS"] }
+</code></pre></div>
+<p><strong><code>NONE</code></strong> grants to nobody.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"permissions": { "mode": "NONE" },
+"reaction_flags": { "fortress_mode": true }
+</code></pre></div>
+<p><code>fortress_mode</code> is easy to read backwards. It is a <strong>bypass, not a
+restriction</strong>. True means the player's own civilization type can run the
+reaction <em>without</em> an explicit permit. Combined with <code>NONE</code>, the result is a
+recipe the player has and no other off-type civilization does, so it never
+shows up in off-type caravan stock or on a goblin's back.</p>
+<p>Default is false, meaning the player needs a permit like everyone else.</p>
+<p>Your buildings and tools need no permissions written: RM permits every building
+definition carrying your prefix to every civilization, so it appears in the
+build menu, and gives your tools to the fort's civilization.</p>
+</section>
+<hr>
+<section class="chapter"><h2 id="sec-6" data-num="6"><a class="anchor" href="#sec-6" aria-label="Link to this section">#</a><span class="h-num">6</span><span class="h-text">Reagents and products in depth</span></h2>
+<h3 id="sec-6-1" data-num="6.1"><a class="anchor" href="#sec-6-1" aria-label="Link to this section">#</a><span class="h-num">6.1</span><span class="h-text">Codes are local, material IDs are global</span></h3>
+<p>A reagent's <code>code</code> is a private label inside one reaction. It is how products
+and container links point back at a slot. It never leaves the reaction and
+never takes a prefix. Lowercase by convention. Two reagents in one reaction may
+not share a code.</p>
+<p>Anywhere you write <code>mat_id</code> or <code>metal_id</code>, you are naming a real loaded
+inorganic. Vanilla materials use their bare ID (<code>IRON</code>, <code>GYPSUM</code>,
+<code>QUICKLIME</code>). Module materials use the full prefixed ID (<code>MYMOD_GOLDBRONZE</code>).
+<code>mat_token</code> names any material by its full token (section <a class="xref" href="#sec-6-9">6.9</a>).</p>
+<h3 id="sec-6-2" data-num="6.2"><a class="anchor" href="#sec-6-2" aria-label="Link to this section">#</a><span class="h-num">6.2</span><span class="h-text">Reagent fields</span></h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>code</code></td>
+<td>Required. Unique within the reaction.</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td>Required. An entry in <code>REAGENT_TYPES</code> (section <a class="xref" href="#sec-6-3">6.3</a>, Appendix <a class="xref" href="#appendix-a">A</a>).</td>
+</tr>
+<tr>
+<td><code>quantity</code></td>
+<td>Required. A number. Powders and liquids count in dimension units, where 150 is one full bag or bucket.</td>
+</tr>
+<tr>
+<td><code>mat_id</code></td>
+<td>An inorganic ID. Types that need a specific material require <code>mat_id</code> or <code>mat_token</code>.</td>
+</tr>
+<tr>
+<td><code>mat_token</code></td>
+<td>Any material by its full token (section <a class="xref" href="#sec-6-9">6.9</a>).</td>
+</tr>
+<tr>
+<td><code>metal_id</code></td>
+<td>The metal an <code>ORE_OF</code> reagent's ore smelts to.</td>
+</tr>
+<tr>
+<td><code>tool_id</code></td>
+<td>The tool itemdef a <code>TOOL</code> reagent takes, by code: a module's, RM's catalog's (<code>REFINISH_SAWDUST_TOOL</code>), or vanilla's.</td>
+</tr>
+<tr>
+<td><code>reaction_class</code></td>
+<td>Accept only materials carrying this class.</td>
+</tr>
+<tr>
+<td><code>has_material_reaction_product</code></td>
+<td>Accept only materials that declare this product (section <a class="xref" href="#sec-6-5">6.5</a>).</td>
+</tr>
+<tr>
+<td><code>has_tool_use</code></td>
+<td>A <code>df.tool_uses</code> name (Appendix <a class="xref" href="#appendix-b">B</a>). Overrides the type's own tool use. An unknown name is logged.</td>
+</tr>
+<tr>
+<td><code>vector_id</code></td>
+<td>A <code>df.job_item_vector_id</code> name (Appendix <a class="xref" href="#appendix-b">B</a>): which of DF's item lists the job searches. An unknown name is logged and the reagent keeps its default.</td>
+</tr>
+<tr>
+<td><code>sand_bearing</code></td>
+<td>True: the material must be sand. Sits on the reagent itself, not in <code>flags</code>.</td>
+</tr>
+<tr>
+<td><code>contains</code></td>
+<td>On a container: the code of the reagent it holds (section <a class="xref" href="#sec-6-4">6.4</a>).</td>
+</tr>
+<tr>
+<td><code>reads</code></td>
+<td>The words DF prints for this reagent in the job's hover text and in a red row's objection, in place of its reaction class or code.</td>
+</tr>
+<tr>
+<td><code>flags</code></td>
+<td>A table of flags, below.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Flags, each true or false:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Flags</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reagent</td>
+<td><code>preserve</code>, <code>in_container</code>, <code>does_not_determine_product_amount</code></td>
+</tr>
+<tr>
+<td>Container and item</td>
+<td><code>empty</code>, <code>non_economic</code>, <code>building_material</code>, <code>fire_safe</code>, <code>magma_safe</code>, <code>allow_melt_dump</code>, <code>unrotten</code>, <code>not_bin</code>, <code>solid</code>, <code>furniture</code>, <code>finished_goods</code>, <code>ammo</code>, <code>unimproved</code>, <code>any_raw_material</code></td>
+</tr>
+<tr>
+<td>Material</td>
+<td><code>wood</code>, <code>stone</code>, <code>metal</code>, <code>hard</code>, <code>woven</code>, <code>glass_material</code>, <code>grown_not_crafted</code>, <code>non_artifact</code></td>
+</tr>
+<tr>
+<td>Body and organic</td>
+<td><code>body_part</code>, <code>bone</code>, <code>shell</code>, <code>horn</code>, <code>pearl</code>, <code>ivory_tooth</code>, <code>totemable</code>, <code>leather</code>, <code>silk</code>, <code>yarn</code>, <code>hair_wool</code>, <code>soap</code>, <code>plant</code></td>
+</tr>
+<tr>
+<td>DF flags1</td>
+<td><code>improvable</code>, <code>butcherable</code>, <code>millable</code>, <code>allow_buryable</code>, <code>undisturbed</code>, <code>collected</code>, <code>sharpenable</code>, <code>murdered</code>, <code>processable</code>, <code>cookable</code>, <code>extract_bearing_plant</code>, <code>extract_bearing_fish</code>, <code>extract_bearing_vermin</code>, <code>processable_to_vial</code>, <code>processable_to_barrel</code>, <code>tameable_vermin</code>, <code>nearby</code>, <code>milk</code>, <code>milkable</code>, <code>lye_bearing</code></td>
+</tr>
+<tr>
+<td>DF flags2</td>
+<td><code>dye</code>, <code>dyeable</code>, <code>dyed</code>, <code>sewn_imageless</code>, <code>glass_making</code>, <code>screw</code>, <code>deep_material</code>, <code>melt_designated</code>, <code>allow_artifact</code>, <code>plaster_containing</code>, <code>lye_milk_free</code>, <code>blunt</code>, <code>unengraved</code></td>
+</tr>
+<tr>
+<td>DF flags3</td>
+<td><code>non_absorbent</code>, <code>non_pressed</code>, <code>allow_liquid_powder</code>, <code>any_craft</code>, <code>food_storage</code>, <code>sand</code>, <code>can_use_location_reserved</code>, <code>written_on</code>, <code>edged</code>, <code>on_ground</code>, <code>divine</code>, <code>crafted_artifact</code>, <code>gem</code>, <code>empty_or_water</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><code>non_artifact</code> belongs on every reagent that consumes its input, and above all
+on a reagent of item type -1: without it, a wildcard reagent will eventually
+eat an artifact. <code>allow_artifact</code> and <code>crafted_artifact</code> do the opposite and
+are dangerous.</p>
+<h3 id="sec-6-3" data-num="6.3"><a class="anchor" href="#sec-6-3" aria-label="Link to this section">#</a><span class="h-num">6.3</span><span class="h-text">Choosing a reagent type</span></h3>
+<p><code>REAGENT_TYPES</code> holds 252 entries. Appendix <a class="xref" href="#appendix-a">A</a> lists every one with its item
+type, material and what it needs. The ones you reach for most, grouped by what
+they match:</p>
+<p><strong>Bars</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Matches</th>
+<th>Also needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BAR</code></td>
+<td>One specific metal</td>
+<td><code>mat_id</code> or <code>mat_token</code></td>
+</tr>
+<tr>
+<td><code>BAR_ANY</code></td>
+<td>Any bar at all</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR_COAL</code></td>
+<td>Any coal bar: coke or charcoal</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR_COKE</code></td>
+<td>Coke</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR_CHARCOAL</code></td>
+<td>Charcoal</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR_POTASH</code></td>
+<td>A potash bar</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR_ASH</code></td>
+<td>An ash bar</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR_PEARLASH</code></td>
+<td>A pearlash bar</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Stones and ores</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Matches</th>
+<th>Also needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BOULDER</code></td>
+<td>One specific stone</td>
+<td><code>mat_id</code> or <code>mat_token</code></td>
+</tr>
+<tr>
+<td><code>BOULDER_ANY</code></td>
+<td>Any inorganic, with material picker</td>
+<td>usually <code>flags.non_economic</code></td>
+</tr>
+<tr>
+<td><code>BOULDER_UNTYPED</code></td>
+<td>Any boulder, filtered by tag</td>
+<td><code>reaction_class</code></td>
+</tr>
+<tr>
+<td><code>FLUX</code></td>
+<td>Any flux-bearing stone</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ORE_OF</code></td>
+<td>Any ore that smelts to a metal</td>
+<td><code>metal_id</code></td>
+</tr>
+<tr>
+<td><code>ROCK</code></td>
+<td>A rock item</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Powders, liquids, and their containers</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Matches</th>
+<th>Also needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POWDER</code></td>
+<td>A powder</td>
+<td><code>mat_id</code> or <code>mat_token</code>, optional</td>
+</tr>
+<tr>
+<td><code>POWDER_ANY</code></td>
+<td>Any inorganic powder</td>
+<td>no material picker; see <a class="xref" href="#sec-6-7">6.7</a></td>
+</tr>
+<tr>
+<td><code>WATER</code></td>
+<td>Water</td>
+<td>a container reagent</td>
+</tr>
+<tr>
+<td><code>LIQUID</code></td>
+<td>A non-water builtin liquid</td>
+<td></td>
+</tr>
+<tr>
+<td><code>LIQUID_INORGANIC</code></td>
+<td>A specific inorganic liquid</td>
+<td><code>mat_id</code> or <code>mat_token</code></td>
+</tr>
+<tr>
+<td><code>LIQUID_INORGANIC_ANY</code></td>
+<td>Any inorganic liquid, by tag</td>
+<td><code>reaction_class</code></td>
+</tr>
+<tr>
+<td><code>BAG</code></td>
+<td>A bag</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BUCKET</code></td>
+<td>A bucket</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BARREL</code></td>
+<td>A barrel</td>
+<td></td>
+</tr>
+<tr>
+<td><code>JUG</code></td>
+<td>A jug</td>
+<td></td>
+</tr>
+<tr>
+<td><code>LARGE_POT</code></td>
+<td>A large pot</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CONTAINER</code></td>
+<td>Anything at all. Do not use</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Worked items and tools</strong></p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Matches</th>
+<th>Also needs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BLOCKS</code></td>
+<td>Blocks of one material</td>
+<td><code>mat_id</code> or <code>mat_token</code></td>
+</tr>
+<tr>
+<td><code>BLOCKS_ANY</code></td>
+<td>Blocks of anything</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ROUGH</code></td>
+<td>A specific rough gem</td>
+<td><code>mat_id</code> or <code>mat_token</code></td>
+</tr>
+<tr>
+<td><code>ROUGH_ANY</code></td>
+<td>Any rough gem, by tag</td>
+<td><code>reaction_class</code></td>
+</tr>
+<tr>
+<td><code>STATUE</code></td>
+<td>A statue</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CRAFT_ANY</code></td>
+<td>Any craft item</td>
+<td>a <code>reaction_class</code>, always</td>
+</tr>
+<tr>
+<td><code>BODY_PART</code></td>
+<td>Bone, shell, horn</td>
+<td>the creature flags, always</td>
+</tr>
+<tr>
+<td><code>TOOL</code></td>
+<td>One tool itemdef</td>
+<td><code>tool_id</code></td>
+</tr>
+<tr>
+<td><code>HAS_&lt;USE&gt;</code></td>
+<td>Any tool with that tool use, such as <code>HAS_LIQUID_CONTAINER</code></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>Every other entry is an item type by name, from <code>AXE_BATTLE</code> to <code>WINDOW</code>, and
+matches that item in any material. Appendix <a class="xref" href="#appendix-a">A</a> has them all.</p>
+<p>Renamed in v4: <code>METAL_BAR</code> is now <code>BAR</code>, <code>COKE</code> is <code>BAR_COAL</code>, <code>ANY_ITEM</code> is
+<code>ANY</code>, and <code>ANY_CRAFT</code> is <code>CRAFT_ANY</code>. The old names are refused.</p>
+<p>Three traps worth naming:</p>
+<ul>
+<li><strong>Never use <code>CONTAINER</code>.</strong> It is item type -1 and DF will happily grab a
+metal bar or a weapon as a "container." Use <code>BUCKET</code> or <code>BARREL</code>.</li>
+<li><strong><code>ORE_OF</code> takes the metal, not the ore.</strong> <code>"metal_id": "COPPER"</code> matches
+malachite, tetrahedrite, and any modded copper ore without naming any of them.</li>
+<li><strong><code>CRAFT_ANY</code>, <code>BODY_PART</code> and <code>ANY</code> are item type -1.</strong> They match
+everything until something narrows them. <code>CRAFT_ANY</code> needs a <code>reaction_class</code>;
+<code>BODY_PART</code> needs <code>flags.body_part</code> plus at least one of <code>bone</code>, <code>shell</code>,
+<code>horn</code>. Dropping the narrowing turns the slot into a wildcard over every item
+in the fortress.</li>
+</ul>
+<h3 id="sec-6-4" data-num="6.4"><a class="anchor" href="#sec-6-4" aria-label="Link to this section">#</a><span class="h-num">6.4</span><span class="h-text">The container pattern</span></h3>
+<p>Powders and liquids always travel in something, so they are always two
+reagents. Which flags go where depends on direction.</p>
+<p><strong>Output into a container.</strong> The bag is preserved and must be empty; the
+product names it.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"reagents": [
+    { "code": "limestone", "type": "FLUX", "quantity": 2 },
+    { "code": "bag", "type": "BAG", "quantity": 1,
+      "flags": { "preserve": true, "empty": true } }
+],
+"products": [
+    { "type": "POWDER_MISC", "mat_id": "MYMOD_LIME", "count": 4,
+      "dimension": 150, "to_container": "bag" }
+]
+</code></pre></div>
+<p><strong>Input from a container.</strong> The powder is <code>in_container</code>; the bag is preserved
+and <code>contains</code> the powder.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"reagents": [
+    { "code": "lime", "type": "POWDER", "mat_id": "MYMOD_LIME",
+      "quantity": 150, "flags": { "in_container": true } },
+    { "code": "bag", "type": "BAG", "quantity": 1,
+      "flags": { "preserve": true }, "contains": "lime" }
+]
+</code></pre></div>
+<p>Read the pairing as: the bag <strong>contains</strong> the powder, the powder is <strong>in</strong> a
+container. Put <code>contains</code> on the container, pointing at the contents. A
+<code>contains</code> naming a code the reaction does not have is refused.</p>
+<p><strong>A hard limit:</strong> one slot must be satisfied by the contents of <strong>one bag
+alone</strong>. DF will not aggregate several bags to fill a single slot. If you need
+four bags' worth, that is four reagent slots.</p>
+<h3 id="sec-6-5" data-num="6.5"><a class="anchor" href="#sec-6-5" aria-label="Link to this section">#</a><span class="h-num">6.5</span><span class="h-text">The four ways a product picks its material</span></h3>
+<p>Exactly one. Not zero, not two.</p>
+<p><strong><code>mat_id</code></strong> names an inorganic output directly.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">{ "type": "BAR", "mat_id": "MYMOD_GOLDBRONZE", "count": 4 }
+</code></pre></div>
+<p><strong><code>mat_token</code></strong> names any material by its token, plant materials included
+(section <a class="xref" href="#sec-6-9">6.9</a>).</p>
+<p><strong><code>get_material_same</code></strong> copies the material of a reagent item straight through.
+The knapping pattern: the sharp rock is made of whatever rock was knapped.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">{ "type": "ROCK", "get_material_same": "stone", "count": 2, "force_edge": true }
+</code></pre></div>
+<p><strong><code>get_material_product</code></strong> asks a reagent's material what it derives into, using
+a product code that material declared (section <a class="xref" href="#sec-4-5">4.5</a>). Both <code>reagent_code</code> and
+<code>product_code</code> are required. This is the strongest of the four, and the one
+most worth learning.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"reagents": [
+    { "code": "clay", "type": "BOULDER_ANY", "quantity": 1,
+      "has_material_reaction_product": "FIRED_MAT" }
+],
+"products": [
+    { "type": "BOULDER",
+      "get_material_product": { "reagent_code": "clay", "product_code": "FIRED_MAT" },
+      "count": 1, "dimension": 600 }
+]
+</code></pre></div>
+<p>Nothing here names a clay. The reagent accepts anything that knows how to be
+fired, and the product asks that same material what it fires into. One
+reaction, every clay in the world, including ones added after you shipped.</p>
+<p>When a reagent slot holds several materials, RM shares a
+<code>get_material_same</code> or <code>get_material_product</code> output over the materials that
+slot actually held, by volume, instead of making it all in the first item's
+material. That holds for every custom reaction.</p>
+<h3 id="sec-6-6" data-num="6.6"><a class="anchor" href="#sec-6-6" aria-label="Link to this section">#</a><span class="h-num">6.6</span><span class="h-text">Product options</span></h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>count</code></td>
+<td>1</td>
+<td>How many items. With <code>measure</code>, how many stacks</td>
+</tr>
+<tr>
+<td><code>dimension</code></td>
+<td>150</td>
+<td>150 for a bar or a bag of powder; 600 for a boulder</td>
+</tr>
+<tr>
+<td><code>probability</code></td>
+<td>100</td>
+<td>Percent chance. Use it for byproducts</td>
+</tr>
+<tr>
+<td><code>to_container</code></td>
+<td>none</td>
+<td>Names a reagent code</td>
+</tr>
+<tr>
+<td><code>subtype</code></td>
+<td>none</td>
+<td>An itemdef code such as <code>ITEM_TOOL_JUG</code>, or a module or catalog tool such as <code>REFINISH_CORE_DUST</code>. A code that does not resolve skips the product, with a log line</td>
+</tr>
+<tr>
+<td><code>force_edge</code></td>
+<td>false</td>
+<td>Marks the output as edged</td>
+</tr>
+<tr>
+<td><code>paste</code></td>
+<td>false</td>
+<td>Marks the output as a paste, as vanilla's paper slurry is</td>
+</tr>
+<tr>
+<td><code>measure</code></td>
+<td>false</td>
+<td>With a tool <code>subtype</code>: the amount is measured from the volume that went in, in that tool's own unit, with the part under one unit banked per workshop for the next job</td>
+</tr>
+<tr>
+<td><code>whole</code></td>
+<td>false</td>
+<td>With <code>measure</code>: nothing is banked, and only whole units are paid</td>
+</tr>
+</tbody>
+</table></div>
+<p>Product types (<code>PRODUCT_TYPES</code>): <code>BAR</code>, <code>BAR_COAL</code>, <code>BLOCKS</code>, <code>ROUGH</code>, <code>BOULDER</code>, <code>LIQUID_MISC</code>, <code>POWDER_MISC</code>, <code>ROCK</code>, <code>LIQUID_MISC_INORGANIC</code>, <code>BAR_POTASH</code>, <code>GLOB</code>, <code>BAR_ASH</code>, <code>BAR_PEARLASH</code>, <code>TOOL</code>, <code>CRAFTS</code>, <code>IMPROVEMENT</code>, or any plain <code>df.item_type</code>
+name such as <code>TABLE</code>, <code>ANVIL</code>, or <code>WINDOW</code>.</p>
+<p>Exceptions to the "exactly one material source" rule:</p>
+<ul>
+<li><strong><code>BAR_ASH</code> and <code>BAR_PEARLASH</code></strong> carry their material in the type itself, so
+they name none at all. <code>BAR_COAL</code> and <code>BAR_POTASH</code> still take a material
+source; <code>BAR_COAL</code>'s <code>mat_id</code> names the coal: <code>COKE</code>, <code>CHARCOAL</code> or <code>COAL</code>.</li>
+<li><strong><code>IMPROVEMENT</code></strong> is not an item product. See below.</li>
+</ul>
+<p>New items of a tool whose definition says <code>"stack": true</code> (section <a class="xref" href="#sec-7-1">7.1</a>) are
+merged into one stack per material when a reaction makes them.</p>
+<h3 id="sec-6-7" data-num="6.7"><a class="anchor" href="#sec-6-7" aria-label="Link to this section">#</a><span class="h-num">6.7</span><span class="h-text">Improvement products</span></h3>
+<p>An improvement decorates an existing item rather than creating one. Glazing is
+the vanilla case. It is a different C++ class with a different field set, so it
+follows different rules:</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">{
+    "type": "IMPROVEMENT",
+    "improvement_type": "GLAZED",
+    "target_reagent": "pot",
+    "get_material_product": { "reagent_code": "glaze", "product_code": "GLAZE_MAT" },
+    "probability": 100
+}
+</code></pre></div>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Required</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>improvement_type</code></td>
+<td>Yes</td>
+<td><code>GLAZED</code> or a <code>df.improvement_type</code> name</td>
+</tr>
+<tr>
+<td><code>target_reagent</code></td>
+<td>Yes</td>
+<td>The reagent code being decorated</td>
+</tr>
+<tr>
+<td><code>get_material_product</code></td>
+<td>Yes</td>
+<td>Not optional here, unlike item products</td>
+</tr>
+<tr>
+<td><code>improvement_specific_type</code></td>
+<td>No</td>
+<td>Default 0</td>
+</tr>
+<tr>
+<td><code>probability</code></td>
+<td>No</td>
+<td>Default 100</td>
+</tr>
+</tbody>
+</table></div>
+<p><code>mat_id</code> and <code>get_material_same</code> are <strong>refused</strong> on an improvement product.
+RM clones a live improvement for its structure and keeps that donor's material
+mode flags, which are set for material-from-reagent. Any other mode would be
+injecting against flags nobody set, so validation refuses it rather than
+guessing.</p>
+<p>The reagent being decorated normally wants <code>flags.unimproved</code> so a glazed pot
+cannot be glazed a second time.</p>
+<h3 id="sec-6-8" data-num="6.8"><a class="anchor" href="#sec-6-8" aria-label="Link to this section">#</a><span class="h-num">6.8</span><span class="h-text">The magnifying glass</span></h3>
+<p>The magnifying glass icon lets the player choose which specific material a job
+uses. It appears for <code>BAR</code>, <code>BLOCKS</code>, <code>BOULDER</code>, <code>ROUGH</code>, and <code>SMALLGEM</code>
+reagents when the material is left as any inorganic. <code>BOULDER_ANY</code> is built for
+exactly this.</p>
+<p>It does <strong>not</strong> appear for <code>POWDER_MISC</code>, in any configuration, and a <code>TOOL</code>
+reagent gets none either. That is a DF engine limit, not something runtime
+injection can work around. If your design needs the player to pick the
+material of a powder or a tool, it needs one reaction per material.</p>
+<h3 id="sec-6-9" data-num="6.9"><a class="anchor" href="#sec-6-9" aria-label="Link to this section">#</a><span class="h-num">6.9</span><span class="h-text">One more trap: economic stone</span></h3>
+<p><code>BOULDER_ANY</code> with <code>flags.non_economic</code> grabs every non-economic inorganic in
+the world, and that includes processed materials your own module produced.
+A grinding reaction meant for raw stone will happily eat your finished output.</p>
+<p>The fix is to give processed materials a <code>reaction_class</code>. Carrying one makes a
+material economic, which takes it out of the <code>non_economic</code> net.</p>
+<h3 id="sec-6-10" data-num="6.10"><a class="anchor" href="#sec-6-10" aria-label="Link to this section">#</a><span class="h-num">6.10</span><span class="h-text">Naming any material: <code>mat_token</code></span></h3>
+<p><code>mat_id</code> names an inorganic only. <code>mat_token</code> names any material by its full
+token, the way the raws do, and it works on reagents as well as products:</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">{ "code": "log", "type": "WOOD", "quantity": 1,
+  "mat_token": "PLANT_MAT:ACACIA:WOOD" }
+</code></pre></div>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">{ "type": "POWDER_MISC", "mat_token": "PLANT_MAT:MYMOD_DYE_HOST:MY_DYE",
+  "to_container": "bag", "count": 1, "dimension": 150 }
+</code></pre></div>
+<p>A material on your own host plant is <code>PLANT_MAT:&lt;prefix + plant key&gt;:&lt;material
+key&gt;</code>. Preflight checks those against your plants file; tokens for vanilla or
+another mod's plants resolve when the reaction is built.</p>
+<p>A reagent token that does not resolve closes the slot: the reagent is given a
+reaction class no material carries, so the reaction shows and cannot run, and
+the log names the token. It never falls back to "any material", which would let
+a slot meant for one tree's logs take every log in the fort. Give a token or a
+<code>mat_id</code>, not both; if both are there, the token wins and the log says so.</p>
+</section>
+<hr>
+<section class="chapter"><h2 id="sec-7" data-num="7"><a class="anchor" href="#sec-7" aria-label="Link to this section">#</a><span class="h-num">7</span><span class="h-text">Tools, plants and buildings</span></h2>
+<p>Each of these is an optional JSON file with its own <code>module</code> block, handed to
+RM by your listener (section <a class="xref" href="#sec-8-1">8.1</a>).</p>
+<h3 id="sec-7-1" data-num="7.1"><a class="anchor" href="#sec-7-1" aria-label="Link to this section">#</a><span class="h-num">7.1</span><span class="h-text">Tools</span></h3>
+<p>A tool is an itemdef: a hollow item form whose material comes from whatever it
+is made of. Reactions take it with a <code>TOOL</code> reagent's <code>tool_id</code> and make it
+with a product's <code>subtype</code>, both naming its full ID.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">{
+    "module": { "prefix": "MYMOD_", "name": "My Module", "version": "1.0" },
+    "tools": [
+        { "key": "CRUCIBLE", "name": "crucible", "name_plural": "crucibles",
+          "size": 600, "value": 1, "stack": false,
+          "flags": { "hard_mat": true, "no_default_job": true },
+          "tool_use": ["LIQUID_CONTAINER"] }
+    ]
+}
+</code></pre></div>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>key</code></td>
+<td>Required. Uppercase, no spaces. The tool's ID is <code>&lt;prefix&gt;&lt;key&gt;</code>.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>Required.</td>
+</tr>
+<tr>
+<td><code>name_plural</code>, <code>adjective</code></td>
+<td>Strings. Preflight requires <code>name_plural</code>.</td>
+</tr>
+<tr>
+<td><code>value</code>, <code>tile</code>, <code>size</code>, <code>material_size</code>, <code>capacity</code></td>
+<td>Numbers. <code>capacity</code> is the container capacity.</td>
+</tr>
+<tr>
+<td><code>flags</code></td>
+<td>Any of <code>furniture</code>, <code>inverted_tile</code>, <code>no_default_job</code>, <code>incomplete_item</code>, <code>unimprovable</code>, <code>no_default_improvements</code>, <code>hard_mat</code>, <code>metal_mat</code>, <code>soft_mat</code>, <code>stone_mat</code>, <code>wood_mat</code>, <code>sheet_mat</code>, <code>metal_weapon_mat</code>.</td>
+</tr>
+<tr>
+<td><code>tool_use</code></td>
+<td>An array of <code>df.tool_uses</code> names (Appendix <a class="xref" href="#appendix-b">B</a>).</td>
+</tr>
+<tr>
+<td><code>graphics</code></td>
+<td>The tool's sprite. <code>donor</code> copies every sprite field of another tool, named as a source (section <a class="xref" href="#sec-4-7">4.7</a>), for example <code>{ "donor": "TOOL:ITEM_TOOL_JUG" }</code>. <code>fields</code> writes named itemdef sprite fields (<code>texpos_item</code>, <code>texpos_stone</code> and the rest) one by one, each a source string or a table of <code>donor</code>, <code>offset</code> and <code>fill</code>.</td>
+</tr>
+<tr>
+<td><code>tint</code></td>
+<td>The name of art registered with <code>refinish-sprite-art</code>, drawn in each material's own colour. For tools whose art DF's own tint renders badly.</td>
+</tr>
+<tr>
+<td><code>stack</code></td>
+<td>True: a reaction's new items of this tool merge into one stack per material.</td>
+</tr>
+</tbody>
+</table></div>
+<p>RM builds each tool as a new, empty itemdef: a field you leave out is not
+written, and nothing comes from another tool unless <code>graphics</code> names a donor.
+<code>rm-module-tools-template.json</code> annotates every field.</p>
+<p>Tools are validated one at a time like materials. A reaction with a product
+whose <code>subtype</code> names a tool that was left out is left out with it, and a
+reagent whose <code>tool_id</code> names no injected tool leaves its reaction out when it
+is built. The tool record RM
+keeps across saves is what brings your tool items back as the right tool.</p>
+<h3 id="sec-7-2" data-num="7.2"><a class="anchor" href="#sec-7-2" aria-label="Link to this section">#</a><span class="h-num">7.2</span><span class="h-text">Plants</span></h3>
+<p>A plant file declares host plants: plants that exist to carry materials, such
+as dyes, which DF only stores and lists properly as plant materials.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">{
+    "module": { "prefix": "MYMOD_", "name": "My Module", "version": "1.0" },
+    "plants": [
+        { "key": "DYE_HOST", "name": "dye host", "name_plural": "dye hosts",
+          "materials": [
+              { "key": "MY_DYE", "name": "my dye", "material_class": "DYE",
+                "color": "COBALT", "fallback_colors": ["BLUE"] }
+          ] }
+    ]
+}
+</code></pre></div>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>key</code></td>
+<td>The plant's ID is <code>&lt;prefix&gt;&lt;key&gt;</code>.</td>
+</tr>
+<tr>
+<td><code>name</code>, <code>name_plural</code></td>
+<td>Strings.</td>
+</tr>
+<tr>
+<td><code>donor_plant</code></td>
+<td>The ID of a plant to clone for structure. Without it RM picks one.</td>
+</tr>
+<tr>
+<td><code>plant_flags</code></td>
+<td>A table of plant flags to set or clear by name; an unknown flag is logged.</td>
+</tr>
+<tr>
+<td><code>materials</code></td>
+<td>The host's materials.</td>
+</tr>
+</tbody>
+</table></div>
+<p>A plant material takes <code>key</code>, <code>name</code>, <code>names</code>, <code>material_class</code>, <code>color</code>,
+<code>fallback_colors</code>, <code>display_color</code>, <code>build_color</code>, <code>dye_color</code>, <code>value</code>,
+<code>solid_density</code>, <code>heat</code>, <code>strength</code>, <code>reaction_classes</code> and <code>graphics</code>, as in
+section <a class="xref" href="#sec-4">4</a>. Its token is <code>PLANT_MAT:&lt;prefix&gt;&lt;plant key&gt;:&lt;material key&gt;</code>, so a
+material key is written without your prefix. Always set <code>color</code>: a plant
+material whose <code>color</code> and <code>fallback_colors</code> are all missing or unloaded takes
+descriptor colour 7. A host that declares no materials keeps its donor's.
+<code>rm-module-plants-template.json</code> annotates every field.</p>
+<p>Plants are not checked by RM's validator: the injector guards each definition
+and logs what it could not do. Run preflight, which checks them.</p>
+<h3 id="sec-7-3" data-num="7.3"><a class="anchor" href="#sec-7-3" aria-label="Link to this section">#</a><span class="h-num">7.3</span><span class="h-text">Buildings</span></h3>
+<p>A buildings file injects workshop and furnace definitions, graphics included,
+with no raws.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">{
+    "module": { "prefix": "MYMOD_", "name": "My Module", "version": "1.0" },
+    "buildings": [
+        { "key": "KILNETTE", "name": "Kilnette", "class": "FURNACE",
+          "dim": [3, 3], "workloc": [1, 1],
+          "block": [[0, 0, 0], [0, 1, 0], [0, 0, 0]],
+          "build_items": [ { "type": "BLOCKS", "quantity": 3 } ],
+          "build_labors": ["MASON"],
+          "graphics": { "image": "images/kilnette.png", "tile_dim": 32 } }
+    ]
+}
+</code></pre></div>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>key</code></td>
+<td></td>
+<td>Required. The building's code is <code>&lt;prefix&gt;&lt;key&gt;</code>.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>the key</td>
+<td>Preflight requires it.</td>
+</tr>
+<tr>
+<td><code>class</code></td>
+<td><code>WORKSHOP</code></td>
+<td><code>WORKSHOP</code> or <code>FURNACE</code>. Preflight requires it written.</td>
+</tr>
+<tr>
+<td><code>dim</code></td>
+<td><code>[3, 3]</code></td>
+<td>Width and height in tiles.</td>
+</tr>
+<tr>
+<td><code>workloc</code></td>
+<td>the centre</td>
+<td>Where the worker stands.</td>
+</tr>
+<tr>
+<td><code>block</code></td>
+<td>none</td>
+<td>Rows of 0 and 1: the tiles that block movement.</td>
+</tr>
+<tr>
+<td><code>build_stages</code></td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td><code>build_key</code></td>
+<td>0</td>
+<td>A <code>df.interface_key</code> name or number; an unknown name is logged.</td>
+</tr>
+<tr>
+<td><code>needs_magma</code></td>
+<td>false</td>
+<td></td>
+</tr>
+<tr>
+<td><code>build_labors</code></td>
+<td><code>["MASON"]</code></td>
+<td>Labor names.</td>
+</tr>
+<tr>
+<td><code>labor_description</code></td>
+<td>none</td>
+<td></td>
+</tr>
+<tr>
+<td><code>tooltip</code></td>
+<td>none</td>
+<td>An array of lines.</td>
+</tr>
+<tr>
+<td><code>name_color</code></td>
+<td><code>[0, 7, 1]</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>build_items</code></td>
+<td>none</td>
+<td>Each: <code>type</code> (a <code>df.item_type</code> name; <code>NONE</code> takes any item, narrowed by flags), <code>subtype</code> (a tool ID or a number), <code>mat</code> (a material token; one that does not resolve stops the building injecting), <code>quantity</code> (default 1), <code>reaction_class</code>, and <code>flags1</code>, <code>flags2</code>, <code>flags3</code> (DF's job item flags by name, each true or false). Preflight requires at least one.</td>
+</tr>
+<tr>
+<td><code>graphics</code></td>
+<td>none</td>
+<td><code>image</code> (a PNG path relative to your <code>data</code> folder, such as <code>images/kilnette.png</code>), <code>tile_dim</code> (default 32), <code>sheet_dim</code> (<code>[columns, rows]</code>, default <code>[8 x width, height + 1]</code>), <code>origin</code> (<code>[column, row]</code>), <code>overlay</code> (default true), <code>list_icon</code> (<code>[column, row]</code> on the sheet), or <code>icon_image</code> and <code>icon_dim</code> for a separate icon file, which wins when both are set.</td>
+</tr>
+</tbody>
+</table></div>
+<p>The sheet holds the building in blocks of width x (height + 1) tiles. The
+first four blocks, left to right, are build stages 3, 2, 1 and 0; with
+<code>overlay</code> on, four more blocks follow for the overlay layer.
+<code>rm-module-buildings-template.json</code> annotates every field.</p>
+<p>Buildings are not checked by RM's validator: the injector guards each
+definition and logs what it could not do. A sheet whose cell count does not
+match its declared size is not used: the building is injected without
+graphics, and the log gives both counts. RM permits your
+buildings to every civilization and puts their icons in the build menu.</p>
+<p>Reactions reach your building through a <code>BUILDING_TYPES</code> entry (section <a class="xref" href="#sec-5-2">5.2</a>).</p>
+</section>
+<hr>
+<section class="chapter"><h2 id="sec-8" data-num="8"><a class="anchor" href="#sec-8" aria-label="Link to this section">#</a><span class="h-num">8</span><span class="h-text">The advanced Lua shell</span></h2>
+<p>The basic template hands RM two file paths. That is correct whenever your JSON
+is complete on disk and nothing in it depends on the world that just loaded.</p>
+<p>The advanced template loads the JSON itself, edits the parsed tables in memory,
+and hands RM finished data. Use it when you need to ask a question your JSON
+cannot answer, start helper scripts, or ship tools, plants or buildings:</p>
+<ul>
+<li>Which sand does this world have?</li>
+<li>Is my raws half actually installed?</li>
+<li>What should this alloy be worth, given local metal prices?</li>
+</ul>
+<p>Every system in that template is independent. Delete what you do not need.</p>
+<h3 id="sec-8-1" data-num="8.1"><a class="anchor" href="#sec-8-1" aria-label="Link to this section">#</a><span class="h-num">8.1</span><span class="h-text">The listener contract</span></h3>
+<p>Register once, at load, with <code>register_listener(name, callback, mod_id)</code> on
+<code>refinish-module-engine</code>. Both templates do this for you (<code>register_with_rm</code>
+in the advanced one).</p>
+<p><code>MODULE_ID</code> is your <code>info.txt</code> ID. With it, RM only calls your listener in
+worlds where your mod is active. Without it, your listener is called in every
+world.</p>
+<p>RM calls your listener once per startup, after world raws are loaded, before
+injection. Return a table holding any of:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Key</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>materials_json</code>, <code>reactions_json</code>, <code>tools_json</code>, <code>plants_json</code>, <code>buildings_json</code></td>
+<td>Paths to your JSON files</td>
+</tr>
+<tr>
+<td><code>materials</code>, <code>reactions</code>, <code>categories</code>, <code>tools</code>, <code>plants</code>, <code>buildings</code></td>
+<td>Finished tables instead of paths, alongside a <code>module</code> block on the same table</td>
+</tr>
+<tr>
+<td><code>module</code></td>
+<td>The module block, for finished tables</td>
+</tr>
+<tr>
+<td><code>buildings_dir</code></td>
+<td>With finished <code>buildings</code>: the folder their image paths are relative to</td>
+</tr>
+<tr>
+<td><code>data_dir</code></td>
+<td>With no JSON path to take it from: the folder <code>FILE:</code> sprite sources are relative to</td>
+</tr>
+<tr>
+<td><code>start</code></td>
+<td>A function RM runs once your module is accepted and injected</td>
+</tr>
+<tr>
+<td><code>stop</code></td>
+<td>A function RM runs before your assets leave RAM</td>
+</tr>
+<tr>
+<td><code>on_materials_injected</code></td>
+<td>A function RM runs once your materials are in the array, before your buildings, categories and reactions</td>
+</tr>
+</tbody>
+</table></div>
+<div class="code" data-lang="lua"><button class="copy" type="button">copy</button><pre><code class="language-lua">return { materials_json = path1, reactions_json = path2,
+         start = start_helpers, stop = stop_helpers }
+</code></pre></div>
+<p>A file that will not parse refuses the module. A listener that errors, or
+returns nothing, refuses it too, and the log says which; the usual cause of
+nothing is a <code>MODULE_ID</code> that does not match <code>info.txt</code>, which leaves the
+module unable to find its own folder. Return nothing on any failure that would
+otherwise inject partial content.</p>
+<h3 id="sec-8-2" data-num="8.2"><a class="anchor" href="#sec-8-2" aria-label="Link to this section">#</a><span class="h-num">8.2</span><span class="h-text">Raw dependency checks</span></h3>
+<p>Injection is forgiving in the worst possible way. A missing material resolves
+to index -1 and the reaction silently accepts nothing. A missing colour resolves
+to grey. The player gets a half-working mod and no way to find out why.</p>
+<p>The template has three checks: <code>inorganic_exists</code>, <code>color_exists</code>,
+<code>workshop_exists</code>, run by <code>check_raw_dependencies</code>. Fill in the lists, and a
+missing dependency becomes one clear message instead of a mystery.</p>
+<p>Two notes on how to use them:</p>
+<ul>
+<li><strong>Pick sentinels, not exhaustive lists.</strong> One material that only your raws
+half defines proves the whole file loaded. Checking all twenty-six just makes
+a longer message.</li>
+<li><strong>Report, do not gate.</strong> A missing dependency degrades the module; it does
+not disable it. Say what is wrong and load anyway.</li>
+</ul>
+<h3 id="sec-8-3" data-num="8.3"><a class="anchor" href="#sec-8-3" aria-label="Link to this section">#</a><span class="h-num">8.3</span><span class="h-text">Computing values</span></h3>
+<p>A hardcoded alloy value is a guess about a world you have not seen. Metal
+prices shift with the mods installed, and an alloy priced against vanilla iron
+can end up worth less than its own ingredients.</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"value": null,
+"value_from_reaction": "MAKE_GOLDBRONZE"
+</code></pre></div>
+<p><code>value_from_reaction</code> is not part of RM's schema. RM ignores unknown fields, so
+it passes through untouched and your Lua file reads it. The template's
+<code>calculate_weighted_value</code> averages the live material values of the reaction's
+<code>BAR</code> reagents, weighted by quantity.</p>
+<h3 id="sec-8-4" data-num="8.4"><a class="anchor" href="#sec-8-4" aria-label="Link to this section">#</a><span class="h-num">8.4</span><span class="h-text">Resolving materials at runtime</span></h3>
+<p>Sand is the standard case. Vanilla ships five sand materials and mods add or
+remove more, so your JSON cannot name one. But it cannot leave the slot as a
+wildcard either: a <code>POWDER</code> reagent with no material matches <em>any</em> powder in a
+bag, and once two such slots sit in one reaction, DF has nothing to tell them
+apart and reagent matching goes non-deterministic.</p>
+<p>The pattern:</p>
+<ol>
+<li>Write <code>"mat_id": null</code> as a sentinel meaning "resolve at load time."</li>
+<li>Scan the live raws for something matching a property, such as the
+<code>SOIL_SAND</code> flag.</li>
+<li>Write the real ID into the parsed table before returning it.</li>
+<li>If nothing matches, <strong>remove the affected content</strong> so the module degrades
+cleanly instead of injecting jobs that can never start.</li>
+</ol>
+<p>The engine never sees the null.</p>
+<p>Nothing in <code>resolve_target_id</code> is sand-specific except the flag it tests. Swap
+that test and reuse the shape.</p>
+<h3 id="sec-8-5" data-num="8.5"><a class="anchor" href="#sec-8-5" aria-label="Link to this section">#</a><span class="h-num">8.5</span><span class="h-text">Helper scripts</span></h3>
+<p>Some things the schema cannot express: injecting a button into a workshop's
+order list, hooking job completion, fixing up created items. Those go in
+companion scripts exposing <code>start()</code> and <code>stop()</code>, listed in <code>HELPER_SCRIPTS</code>.</p>
+<p>The template returns <code>start = start_helpers</code> and <code>stop = stop_helpers</code>. RM runs
+<code>start</code> only once your module is accepted and injected, and runs <code>stop</code> before
+every save, at a shutdown and at the map unload, before your assets leave RAM.
+So no helper outlives the data it reads, and a module RM refuses starts
+nothing. You need no map unload hook of your own.</p>
+<p>Never start a script from the listener itself: it runs before validation, and
+before your data is in RAM.</p>
+</section>
+<hr>
+<section class="chapter"><h2 id="sec-9" data-num="9"><a class="anchor" href="#sec-9" aria-label="Link to this section">#</a><span class="h-num">9</span><span class="h-text">Working with other modules</span></h2>
+<h3 id="the-rule"><a class="anchor" href="#the-rule" aria-label="Link to this heading">#</a>The rule</h3>
+<p><strong>Avoid direct reference to another module's material by <code>mat_id</code>.</strong></p>
+<p>If that module is not installed, your reagent resolves to nothing and the
+reaction silently accepts no input. The player sees a job that never starts.</p>
+<h3 id="the-mechanism"><a class="anchor" href="#the-mechanism" aria-label="Link to this heading">#</a>The mechanism</h3>
+<p>Modules interact best through shared <code>reaction_class</code> tags.</p>
+<p>A material opts in by carrying a tag:</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">{
+    "key": "SLAG",
+    "reaction_classes": ["THERMALLY_PROCESSED", "BYPRODUCT"]
+}
+</code></pre></div>
+<p>A reaction anywhere asks for the tag, not the material:</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">{
+    "code": "slag",
+    "type": "BOULDER_UNTYPED",
+    "quantity": 3,
+    "reaction_class": "THERMALLY_PROCESSED"
+}
+</code></pre></div>
+<p>Neither side knows the other exists. If the producing module is not installed,
+the reaction simply finds no input; it does not break. If three modules produce
+tagged materials, all three feed the same reaction.</p>
+<p>Name tags after the <strong>process</strong>, not after your material. <code>THERMALLY_PROCESSED</code>
+invites participation. <code>MYMOD_SLAG</code> does not.</p>
+<h3 id="depends_on"><a class="anchor" href="#depends_on" aria-label="Link to this heading">#</a><code>depends_on</code></h3>
+<p>When you genuinely must name another module's material, declare it:</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"module": {
+    "prefix": "MYNEWMOD_",
+    "name": "My New Module",
+    "version": "1.0",
+    "depends_on": ["MYOLDMOD_"]
+}
+</code></pre></div>
+<p>Each entry is a prefix ending in an underscore, and not your own. RM injects
+the named modules first. A module whose dependency is missing is skipped, and
+the log names what it needed. This is for <code>reaction_products</code> links and similar
+hard references, not a substitute for reaction classes.</p>
+<p>Cross-module <code>reaction_products</code> are resolved in a final pass after every module
+has injected, so they work in either direction, including mutual references.</p>
+<h3 id="rms-catalog-requires"><a class="anchor" href="#rms-catalog-requires" aria-label="Link to this heading">#</a>RM's catalog: <code>requires</code></h3>
+<p>RM carries a catalog of general item forms that any module may use: dust
+(<code>REFINISH_CORE_DUST</code>, always present) and forms injected only when an accepted
+module asks for them, each a tool named <code>REFINISH_&lt;FORM&gt;_TOOL</code>:</p>
+<ul>
+<li><code>GRAVEL</code>, with its crush reactions at the mason's workshop and the stone
+aggregate twins (<code>REFINISH_CORE_AGG_&lt;stone&gt;</code>) that carry the AGGREGATE class;</li>
+<li>the byproduct forms <code>SAWDUST</code>, <code>BARK</code>, <code>SCRAP</code>, <code>CULLET</code> and <code>CRUST</code> (with
+its gall material);</li>
+<li><code>HEAP</code>, a bar sized heap (600) for loose bulk, carrying the slag
+material: while it is injected RM pays an ore smelt's whole loss as slag
+heaps, and recipes take slag by <code>AGGREGATE</code> or <code>SLAG</code>.</li>
+</ul>
+<p>A form is a hollow item type; what it is comes from the material you put on
+it. Ask for one rather than defining your own, so players never carry two of
+the same thing. The catalog holds only content many modules can use:
+anything that only makes sense inside your module stays in your module.</p>
+<p>Reaction keys (<code>refinish-reaction-keys</code>) are the exception to sharing: give
+your keys a tool of your own, because a watcher sweeps its key tool by subtype
+and removes keys it does not recognise.</p>
+<p>Ask for the forms you use in any of your module blocks:</p>
+<div class="code" data-lang="json"><button class="copy" type="button">copy</button><pre><code class="language-json">"module": {
+    "prefix": "MYMOD_",
+    "name": "My Module",
+    "version": "1.0",
+    "requires": ["GRAVEL", "SAWDUST"]
+}
+</code></pre></div>
+<p>RM injects every requested form before your module, so your reactions can name
+<code>REFINISH_SAWDUST_TOOL</code> as a <code>tool_id</code>. A name that is not in the catalog this
+session is logged as an error naming your module, and your module runs without
+it.</p>
+<p>If your module is a Lua listener returning one table, put <code>requires</code> in that
+table's module block, or gather it there from your other files' blocks (see how
+<code>making_fuel.lua</code> does it).</p>
+<h3 id="rms-services"><a class="anchor" href="#rms-services" aria-label="Link to this heading">#</a>RM's services</h3>
+<p>RM runs shared systems once for every module. Each publishes a handle on <code>_G</code>
+(or is a script you <code>reqscript</code>), and the table below lists its calls.
+Make your calls from <code>start</code> and undo them in <code>stop</code>.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Handle</th>
+<th>Calls</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Byproducts</td>
+<td><code>_G.refinish_byproducts_api</code></td>
+<td><code>register(owner, spec)</code>, <code>unregister(owner)</code>, <code>credit(mode, form, building_id, amount)</code>. Pays your streams from the material a job measurably destroys; RM's dust, and gravel while <code>GRAVEL</code> is registered, are paid first and your streams share what is left.</td>
+</tr>
+<tr>
+<td>Adaptive reactions</td>
+<td><code>_G.refinish_adaptive_api</code></td>
+<td><code>register(owner, { valuation = ..., reactions = ... })</code>, <code>unregister(owner)</code>, <code>register_alias(clone_code, base_code)</code>, <code>resweep_orphans()</code>. Product counts written from the value of what went in.</td>
+</tr>
+<tr>
+<td>Loop dispatcher</td>
+<td><code>_G.refinish_dispatch_api</code></td>
+<td><code>subscribe(name, { tier or every, jobs, fn, paused })</code>, <code>unsubscribe(name)</code>. Tiers: <code>frame</code> 1, <code>fast</code> 5, <code>steady</code> 10, <code>slow</code> 100 frames. One shared walk of the job list.</td>
+</tr>
+<tr>
+<td>Material classes</td>
+<td><code>_G.refinish_class_api</code></td>
+<td><code>grant(owner, { class = ..., ids = { ... } })</code>. Gives existing materials a reaction class while RM's data is loaded; every grant is taken back before a save.</td>
+</tr>
+<tr>
+<td>Organic stockpiles</td>
+<td><code>_G.refinish_organic_api</code></td>
+<td><code>claim(owner, category, select, opts)</code>, <code>unclaim(owner)</code>. Or <code>organic_category</code> on a material (section <a class="xref" href="#sec-4">4</a>).</td>
+</tr>
+<tr>
+<td>Stockpile windows</td>
+<td><code>_G.refinish_window_api</code></td>
+<td><code>claim</code>, <code>unclaim</code>, <code>hide</code>, <code>unhide</code>, <code>label</code>, <code>unlabel</code>, <code>tagged</code>. Lets hidden twin materials stockpile as their sources, hides materials from menus, relabels stockpile rows. A claim's or hide's <code>menu_tag</code> also goes on its twins' names while a work order's conditions are open, since a condition's Material list draws each row from the material's name: "clay (binder)". <code>tagged()</code> lists every tagged material.</td>
+</tr>
+<tr>
+<td>Fertilize service</td>
+<td><code>_G.refinish_fertilize_api</code></td>
+<td><code>request(owner)</code>, <code>withdraw(owner)</code>. Off unless a module requests it: DF's fertilize jobs then take any tool whose material carries the <code>FERTILIZER</code> class, potash last.</td>
+</tr>
+<tr>
+<td>Bank readout</td>
+<td><code>_G.refinish_bank_providers</code></td>
+<td>Set <code>.&lt;name&gt; = { order = n, fn = function(building) ... end }</code>. Rows on the panel beside a building's sheet.</td>
+</tr>
+<tr>
+<td>Module settings</td>
+<td><code>refinish-module-config</code></td>
+<td><code>register(module_id, spec)</code>, <code>get(module_id, key)</code>, <code>set</code>, <code>cycle</code>, <code>list</code>, <code>refused</code>. Settings pages on RM's HUD (below).</td>
+</tr>
+<tr>
+<td>Persistent banks</td>
+<td><code>refinish-persist-banks</code></td>
+<td><code>open(name)</code>: a table saved with the fort, under site data <code>refinish_bank:&lt;name&gt;</code>.</td>
+</tr>
+<tr>
+<td>Reaction keys</td>
+<td><code>refinish-reaction-keys</code></td>
+<td><code>ledger()</code>, <code>sites(kind_fn)</code>, <code>scrap(item)</code>, <code>busy(item)</code>, <code>at_pos(item, pos)</code>. A reaction that lights only where something is present.</td>
+</tr>
+<tr>
+<td>Job surgery</td>
+<td><code>refinish-job-surgery</code></td>
+<td><code>holds_nothing(job)</code>, <code>count(job, owns)</code>, <code>append(job, proto)</code>, <code>erase(job, owns, opts)</code>. The safe way to change a live job's item filters.</td>
+</tr>
+<tr>
+<td>Lookups</td>
+<td><code>refinish-resolve</code></td>
+<td><code>material(token)</code>, <code>material_index(token)</code>, <code>tool_subtype(code, item_type)</code>, <code>reaction(code)</code>, <code>reactions_prefixed(prefix)</code>, <code>invalidate()</code>.</td>
+</tr>
+<tr>
+<td>Sprites</td>
+<td><code>refinish-sprite-art</code>, <code>refinish-sprite-engine</code></td>
+<td><code>register(name, charmap, profile)</code> for <code>TINT:</code> art; <code>apply_to_material</code>, <code>apply_to_tool</code>, <code>apply_edits</code>.</td>
+</tr>
+<tr>
+<td>Logging</td>
+<td><code>refinish-log</code></td>
+<td><code>compose(system, subsystem, subject, type, message)</code>: a line in RM's log grammar, for <code>_G.refinish_log_event</code>.</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Module settings.</strong> <code>register(module_id, spec)</code> puts a section on RM's HUD
+settings pages. <code>spec</code> has <code>title</code>, an optional <code>on_change(key, value, old)</code>
+that may refuse a change by returning false and a reason, and <code>settings</code>: each
+with <code>key</code> (upper case), <code>label</code>, <code>kind</code> (<code>toggle</code>, <code>choice</code> or <code>number</code>),
+<code>options</code> (each <code>{ value = ..., label = ... }</code>; a toggle may leave them out),
+<code>default</code> (one of the options), <code>applies</code> (<code>now</code>, <code>restart</code> or <code>reload</code>;
+default <code>now</code>), <code>restart_note</code> and <code>description</code>. Limits: a module ID of 1 to
+48 letters, digits or underscores; up to 16 settings; a title of up to 24
+characters, a key of 32, a label of 22, 2 to 12 options of up to 14 characters,
+a description of up to 600 and a restart note of up to 48. A spec that breaks a
+limit is refused whole with an error, and <code>get</code> then answers nil: treat nil as
+"use your default". Values are stored per fort.</p>
+</section>
+<hr>
+<section class="chapter"><h2 id="sec-10" data-num="10"><a class="anchor" href="#sec-10" aria-label="Link to this section">#</a><span class="h-num">10</span><span class="h-text">Troubleshooting</span></h2>
+<h3 id="module-never-appears-in-the-log"><a class="anchor" href="#module-never-appears-in-the-log" aria-label="Link to this heading">#</a>Module never appears in the log</h3>
+<p>The listener never registered or never returned. Check in order:</p>
+<ul>
+<li>Is the Lua file in <code>scripts_modinstalled/</code>?</li>
+<li>Does <code>MODULE_ID</code> exactly match <code>[ID:...]</code> in info.txt? A mismatch makes the
+path lookup fail, and, when passed as <code>mod_id</code>, the log warns that it
+matches no installed mod.</li>
+<li>Is RM itself installed and enabled?</li>
+</ul>
+<h3 id="rejected-omitted-and-left-out"><a class="anchor" href="#rejected-omitted-and-left-out" aria-label="Link to this heading">#</a>"Rejected", "Omitted" and "left out"</h3>
+<p>RM checks your materials, reactions, categories and tools one entry at a time.
+A bad entry is <strong>omitted</strong> and named, and the rest of your module still runs. A
+reaction that names an omitted material (by <code>mat_id</code> or an <code>INORGANIC:</code>
+<code>mat_token</code>), or names an omitted tool as a product <code>subtype</code>, is omitted with
+it.</p>
+<p>The module is <strong>rejected</strong> whole when its listener errors or returns nothing,
+when a JSON file will not parse, when its materials or reactions <code>module</code> block
+is invalid, when nothing valid is left in its materials or reactions, when the
+materials and reactions prefixes differ, when no file carries a prefix, or when
+its prefix overlaps another module's or <code>REFINISH_STEEL_</code>.</p>
+<p>The message names the exact field. Common causes:</p>
+<ul>
+<li><code>module.prefix</code> does not end in an underscore.</li>
+<li>The materials and reactions prefixes differ.</li>
+<li>A material or tool <code>key</code> has lowercase letters or a space.</li>
+<li>A <code>material_class</code> of <code>GEM</code> with no <code>gem_names</code>.</li>
+<li>A product with zero or two material sources.</li>
+<li>A <code>contains</code> naming a reagent code that does not exist.</li>
+<li>A reagent type that no longer exists (section <a class="xref" href="#sec-6-3">6.3</a>, renamed in v4).</li>
+</ul>
+<h3 id="prefix-overlaps"><a class="anchor" href="#prefix-overlaps" aria-label="Link to this heading">#</a>"prefix overlaps"</h3>
+<p>Another module's prefix is a stem of yours or vice versa. Rename.</p>
+<h3 id="material-is-the-wrong-colour"><a class="anchor" href="#material-is-the-wrong-colour" aria-label="Link to this heading">#</a>Material is the wrong colour</h3>
+<p><code>color</code> names a descriptor colour ID that is not loaded in this world, and no
+<code>fallback_colors</code> entry is loaded either, so RM used descriptor colour 7. Add
+<code>fallback_colors</code>, and add a <code>color_exists</code> check so it stops being silent.</p>
+<h3 id="reaction-appears-but-never-starts"><a class="anchor" href="#reaction-appears-but-never-starts" aria-label="Link to this heading">#</a>Reaction appears but never starts</h3>
+<p>Almost always a reagent that matches nothing:</p>
+<ul>
+<li>A <code>mat_id</code> naming a material that does not exist. Check with <code>refinish-find</code>.</li>
+<li>A <code>mat_token</code> that did not resolve: the log names it, and the slot is closed.</li>
+<li>A container slot needing more than one bag's contents.</li>
+<li>A <code>reaction_class</code> no loaded material carries.</li>
+<li>Conflicting filters, such as a <code>mat_id</code> and <code>sand_bearing</code> on the same slot.</li>
+</ul>
+<h3 id="reaction-does-not-appear-at-all"><a class="anchor" href="#reaction-does-not-appear-at-all" aria-label="Link to this heading">#</a>Reaction does not appear at all</h3>
+<ul>
+<li>It was omitted: the log says why.</li>
+<li>The <code>category</code> is not the full prefixed ID.</li>
+<li>The building is a custom workshop that is not installed.</li>
+<li>Permissions excluded the player's civilization, and <code>fortress_mode</code> is false.</li>
+</ul>
+<h3 id="reaction-eats-the-wrong-thing"><a class="anchor" href="#reaction-eats-the-wrong-thing" aria-label="Link to this heading">#</a>Reaction eats the wrong thing</h3>
+<p>A <code>BOULDER_ANY</code> with <code>non_economic</code> is catching your own processed materials.
+Give those a <code>reaction_class</code> (section <a class="xref" href="#sec-6-9">6.9</a>).</p>
+<h3 id="diagnostics"><a class="anchor" href="#diagnostics" aria-label="Link to this heading">#</a>Diagnostics</h3>
+<ul>
+<li><code>preflight.py</code> catches schema and reference problems before you launch DF.
+Run it first; it is faster than any in-game test.</li>
+<li><code>refinish-find</code> locates injected content in memory.</li>
+<li><code>refinish-path</code> traces how something was built.</li>
+<li>RM's log panel records every injection decision, including which structural
+template each reaction cloned. Set Log Detail to Debug to see all of it.</li>
+</ul>
+</section>
+<hr>
+<section class="chapter"><h2 id="sec-11" data-num="11"><a class="anchor" href="#sec-11" aria-label="Link to this section">#</a><span class="h-num">11</span><span class="h-text">Rules and conventions</span></h2>
+<h3 id="hard-rules"><a class="anchor" href="#hard-rules" aria-label="Link to this heading">#</a>Hard rules</h3>
+<ol>
+<li><strong>Never reference another module's material by <code>mat_id</code></strong> without declaring
+<code>depends_on</code>. Use reaction classes.</li>
+<li><strong>Your prefix must not overlap anyone else's</strong>, in either direction, nor
+RM's own.</li>
+<li><strong>Verify vanilla assets you depend on.</strong> Another mod may have cut them.</li>
+<li><strong>Start your scripts in <code>start</code> and stop them in <code>stop</code></strong>, never from the
+listener.</li>
+</ol>
+<h3 id="naming"><a class="anchor" href="#naming" aria-label="Link to this heading">#</a>Naming</h3>
+<ul>
+<li><strong>Material, tool, plant and building keys:</strong> uppercase, underscores, no
+spaces. Descriptive of the thing, not the process. <code>GOLDBRONZE</code>, not
+<code>ALLOY_3</code>.</li>
+<li><strong>Reaction keys:</strong> uppercase, verb first. <code>MAKE_GOLDBRONZE</code>, <code>GRIND_CEMENT</code>.</li>
+<li><strong>Reaction names:</strong> lowercase, verb first, the way vanilla phrases it.
+<code>make gold bronze bars</code>.</li>
+<li><strong>Reagent codes:</strong> lowercase, local, descriptive. <code>copper_bar</code>, <code>sand_bag_1</code>.</li>
+</ul>
+<h3 id="content"><a class="anchor" href="#content" aria-label="Link to this heading">#</a>Content</h3>
+<ul>
+<li>Set <code>skill</code> on every reaction.</li>
+<li>Set real numbers rather than leaving nulls, except where you compute them.</li>
+<li>Always supply <code>fallback_colors</code>.</li>
+<li>Give processed materials a <code>reaction_class</code>, both for interoperation and to
+keep them out of <code>non_economic</code> filters.</li>
+<li>Put <code>non_artifact</code> on every reagent that consumes a wildcard input.</li>
+</ul>
+<h3 id="reference-files"><a class="anchor" href="#reference-files" aria-label="Link to this heading">#</a>Reference files</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>File</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>refinish-module-types.lua</code></td>
+<td>The authoritative list of every reagent type, product type, building, skill, material class, item vector and tool use</td>
+</tr>
+<tr>
+<td><code>rm-module-materials-template.json</code></td>
+<td>Annotated materials template</td>
+</tr>
+<tr>
+<td><code>rm-module-reactions-template.json</code></td>
+<td>Annotated reactions template</td>
+</tr>
+<tr>
+<td><code>rm-module-tools-template.json</code></td>
+<td>Annotated tools template</td>
+</tr>
+<tr>
+<td><code>rm-module-plants-template.json</code></td>
+<td>Annotated plants template</td>
+</tr>
+<tr>
+<td><code>rm-module-buildings-template.json</code></td>
+<td>Annotated buildings template</td>
+</tr>
+<tr>
+<td><code>rm-module-template.lua</code></td>
+<td>Basic Lua shell</td>
+</tr>
+<tr>
+<td><code>rm-module-template-advanced.lua</code></td>
+<td>Full Lua shell with runtime helpers and start and stop hooks</td>
+</tr>
+<tr>
+<td><code>preflight.py</code></td>
+<td>Offline schema and reference checker</td>
+</tr>
+</tbody>
+</table></div>
+<p>When this guide and <code>refinish-module-types.lua</code> disagree, the Lua file is
+correct. It is what the engine actually reads.</p>
+</section>
+<hr>
+<section class="chapter"><h2 id="appendix-a" data-num="A"><a class="anchor" href="#appendix-a" aria-label="Link to this section">#</a><span class="h-num">A</span><span class="h-text">Every reagent type</span></h2>
+<p>All 252 entries in <code>REAGENT_TYPES</code>, as the code defines them. Item is the item
+type the slot takes (-1 is any item). Material is the material class: any,
+inorganic, or a builtin material. Notes are what the entry needs or sets.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Item</th>
+<th>Material</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ALTAR</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_ALTAR</code></td>
+</tr>
+<tr>
+<td><code>AMMO</code></td>
+<td>AMMO</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>AMULET</code></td>
+<td>AMULET</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ANIMALTRAP</code></td>
+<td>ANIMALTRAP</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ANVIL</code></td>
+<td>ANVIL</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ANY</code></td>
+<td>-1</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ARMORSTAND</code></td>
+<td>ARMORSTAND</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ARMOR</code></td>
+<td>ARMOR</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ARROWS</code></td>
+<td>AMMO</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_AMMO_ARROWS</code></td>
+</tr>
+<tr>
+<td><code>AXE_BATTLE</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_AXE_BATTLE</code></td>
+</tr>
+<tr>
+<td><code>AXE_GREAT</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_AXE_GREAT</code></td>
+</tr>
+<tr>
+<td><code>AXE_TRAINING</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_AXE_TRAINING</code></td>
+</tr>
+<tr>
+<td><code>BACKPACK</code></td>
+<td>BACKPACK</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAG</code></td>
+<td>BAG</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BALLISTAARROWHEAD</code></td>
+<td>BALLISTAARROWHEAD</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BALLISTAPARTS</code></td>
+<td>BALLISTAPARTS</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BARREL</code></td>
+<td>BARREL</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR_ANY</code></td>
+<td>BAR</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR_ASH</code></td>
+<td>BAR</td>
+<td>builtin 9</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR_CHARCOAL</code></td>
+<td>BAR</td>
+<td>builtin 7</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR_COAL</code></td>
+<td>BAR</td>
+<td>builtin 7</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR_COKE</code></td>
+<td>BAR</td>
+<td>builtin 7</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR_PEARLASH</code></td>
+<td>BAR</td>
+<td>builtin 10</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR_POTASH</code></td>
+<td>BAR</td>
+<td>builtin 8</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BAR</code></td>
+<td>BAR</td>
+<td>inorganic</td>
+<td><code>mat_id</code> or <code>mat_token</code></td>
+</tr>
+<tr>
+<td><code>BED</code></td>
+<td>BED</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BIN</code></td>
+<td>BIN</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BLOCKS_ANY</code></td>
+<td>BLOCKS</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BLOCKS</code></td>
+<td>BLOCKS</td>
+<td>inorganic</td>
+<td><code>mat_id</code> or <code>mat_token</code></td>
+</tr>
+<tr>
+<td><code>BLOWDARTS</code></td>
+<td>AMMO</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_AMMO_BLOWDARTS</code></td>
+</tr>
+<tr>
+<td><code>BLOWGUN</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_BLOWGUN</code></td>
+</tr>
+<tr>
+<td><code>BODY_PART</code></td>
+<td>-1</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BOLTS</code></td>
+<td>AMMO</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_AMMO_BOLTS</code></td>
+</tr>
+<tr>
+<td><code>BOLT_THROWER_PARTS</code></td>
+<td>BOLT_THROWER_PARTS</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BOOKCASE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_BOOKCASE</code></td>
+</tr>
+<tr>
+<td><code>BOOK_BINDING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_BOOK_BINDING</code></td>
+</tr>
+<tr>
+<td><code>BOOK</code></td>
+<td>BOOK</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BOOTS_LOW</code></td>
+<td>SHOES</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_SHOES_BOOTS_LOW</code></td>
+</tr>
+<tr>
+<td><code>BOOTS</code></td>
+<td>SHOES</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_SHOES_BOOTS</code></td>
+</tr>
+<tr>
+<td><code>BOULDER_ANY</code></td>
+<td>BOULDER</td>
+<td>inorganic</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BOULDER_UNTYPED</code></td>
+<td>4</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BOULDER</code></td>
+<td>BOULDER</td>
+<td>inorganic</td>
+<td><code>mat_id</code> or <code>mat_token</code></td>
+</tr>
+<tr>
+<td><code>BOWL</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_BOWL</code></td>
+</tr>
+<tr>
+<td><code>BOW</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_BOW</code></td>
+</tr>
+<tr>
+<td><code>BOX</code></td>
+<td>BOX</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BRACELET</code></td>
+<td>BRACELET</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BRAIES</code></td>
+<td>PANTS</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_PANTS_BRAIES</code></td>
+</tr>
+<tr>
+<td><code>BRANCH</code></td>
+<td>BRANCH</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>BREASTPLATE</code></td>
+<td>ARMOR</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_ARMOR_BREASTPLATE</code></td>
+</tr>
+<tr>
+<td><code>BUCKET</code></td>
+<td>BUCKET</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CABINET</code></td>
+<td>CABINET</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CAGE</code></td>
+<td>CAGE</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CAPE</code></td>
+<td>ARMOR</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_ARMOR_CAPE</code></td>
+</tr>
+<tr>
+<td><code>CAP</code></td>
+<td>HELM</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_HELM_CAP</code></td>
+</tr>
+<tr>
+<td><code>CATAPULTPARTS</code></td>
+<td>CATAPULTPARTS</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CAULDRON</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_CAULDRON</code></td>
+</tr>
+<tr>
+<td><code>CHAIN</code></td>
+<td>CHAIN</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CHAIR</code></td>
+<td>CHAIR</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CHAUSSE</code></td>
+<td>SHOES</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_SHOES_CHAUSSE</code></td>
+</tr>
+<tr>
+<td><code>CHEESE</code></td>
+<td>CHEESE</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CLOAK</code></td>
+<td>ARMOR</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_ARMOR_CLOAK</code></td>
+</tr>
+<tr>
+<td><code>CLOTH</code></td>
+<td>CLOTH</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>COAT</code></td>
+<td>ARMOR</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_ARMOR_COAT</code></td>
+</tr>
+<tr>
+<td><code>COFFIN</code></td>
+<td>COFFIN</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>COIN</code></td>
+<td>COIN</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CONTAINER</code></td>
+<td>-1</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CORPSEPIECE</code></td>
+<td>CORPSEPIECE</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CORPSE</code></td>
+<td>CORPSE</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CRAFT_ANY</code></td>
+<td>-1</td>
+<td>any</td>
+<td>sets flags3.any_craft</td>
+</tr>
+<tr>
+<td><code>CROSSBOW</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_CROSSBOW</code></td>
+</tr>
+<tr>
+<td><code>CROWN</code></td>
+<td>CROWN</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>CRUTCH</code></td>
+<td>CRUTCH</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>DAGGER_LARGE</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_DAGGER_LARGE</code></td>
+</tr>
+<tr>
+<td><code>DIE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_DIE</code></td>
+</tr>
+<tr>
+<td><code>DISPLAY_CASE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_DISPLAY_CASE</code></td>
+</tr>
+<tr>
+<td><code>DOOR</code></td>
+<td>DOOR</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>DRESS</code></td>
+<td>ARMOR</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_ARMOR_DRESS</code></td>
+</tr>
+<tr>
+<td><code>DRINK</code></td>
+<td>DRINK</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>EARRING</code></td>
+<td>EARRING</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>EGG</code></td>
+<td>EGG</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ENORMOUSCORKSCREW</code></td>
+<td>TRAPCOMP</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TRAPCOMP_ENORMOUSCORKSCREW</code></td>
+</tr>
+<tr>
+<td><code>FIGURINE</code></td>
+<td>FIGURINE</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>FISH_RAW</code></td>
+<td>FISH_RAW</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>FISH</code></td>
+<td>FISH</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>FLAIL</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_FLAIL</code></td>
+</tr>
+<tr>
+<td><code>FLASK</code></td>
+<td>FLASK</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>FLOODGATE</code></td>
+<td>FLOODGATE</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>FLUX</code></td>
+<td>BOULDER</td>
+<td>any</td>
+<td>class FLUX</td>
+</tr>
+<tr>
+<td><code>FOOD</code></td>
+<td>FOOD</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>FOOTWEAR_ANY</code></td>
+<td>SHOES</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>FORK_CARVING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_FORK_CARVING</code></td>
+</tr>
+<tr>
+<td><code>GAUNTLETS</code></td>
+<td>GLOVES</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_GLOVES_GAUNTLETS</code></td>
+</tr>
+<tr>
+<td><code>GEM_ANY</code></td>
+<td>GEM</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>GEM</code></td>
+<td>GEM</td>
+<td>inorganic</td>
+<td><code>mat_id</code> or <code>mat_token</code></td>
+</tr>
+<tr>
+<td><code>GIANTAXEBLADE</code></td>
+<td>TRAPCOMP</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TRAPCOMP_GIANTAXEBLADE</code></td>
+</tr>
+<tr>
+<td><code>GLOB</code></td>
+<td>GLOB</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>GLOVES</code></td>
+<td>GLOVES</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_GLOVES_GLOVES</code></td>
+</tr>
+<tr>
+<td><code>GOBLET</code></td>
+<td>GOBLET</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>GRATE</code></td>
+<td>GRATE</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>GREAVES</code></td>
+<td>PANTS</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_PANTS_GREAVES</code></td>
+</tr>
+<tr>
+<td><code>HALBERD</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_HALBERD</code></td>
+</tr>
+<tr>
+<td><code>HAMMER_WAR</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_HAMMER_WAR</code></td>
+</tr>
+<tr>
+<td><code>HANDWEAR_ANY</code></td>
+<td>GLOVES</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>HAS_BOOKCASE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use BOOKCASE</td>
+</tr>
+<tr>
+<td><code>HAS_CONTAIN_WRITING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use CONTAIN_WRITING</td>
+</tr>
+<tr>
+<td><code>HAS_DISPLAY_OBJECT</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use DISPLAY_OBJECT</td>
+</tr>
+<tr>
+<td><code>HAS_DIVINATION</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use DIVINATION</td>
+</tr>
+<tr>
+<td><code>HAS_FOOD_STORAGE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use FOOD_STORAGE</td>
+</tr>
+<tr>
+<td><code>HAS_GAMES_OF_CHANCE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use GAMES_OF_CHANCE</td>
+</tr>
+<tr>
+<td><code>HAS_GRIND_POWDER_RECEPTACLE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use GRIND_POWDER_RECEPTACLE</td>
+</tr>
+<tr>
+<td><code>HAS_HEAVY_OBJECT_HAULING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use HEAVY_OBJECT_HAULING</td>
+</tr>
+<tr>
+<td><code>HAS_HIVE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use HIVE</td>
+</tr>
+<tr>
+<td><code>HAS_HOLD_MEAT_FOR_CARVING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use HOLD_MEAT_FOR_CARVING</td>
+</tr>
+<tr>
+<td><code>HAS_LIQUID_CONTAINER</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use LIQUID_CONTAINER</td>
+</tr>
+<tr>
+<td><code>HAS_LIQUID_COOKING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use LIQUID_COOKING</td>
+</tr>
+<tr>
+<td><code>HAS_LIQUID_SCOOP</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use LIQUID_SCOOP</td>
+</tr>
+<tr>
+<td><code>HAS_MEAL_CONTAINER</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use MEAL_CONTAINER</td>
+</tr>
+<tr>
+<td><code>HAS_MEAT_BONING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use MEAT_BONING</td>
+</tr>
+<tr>
+<td><code>HAS_MEAT_CARVING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use MEAT_CARVING</td>
+</tr>
+<tr>
+<td><code>HAS_MEAT_CLEAVING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use MEAT_CLEAVING</td>
+</tr>
+<tr>
+<td><code>HAS_MEAT_SLICING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use MEAT_SLICING</td>
+</tr>
+<tr>
+<td><code>HAS_NEST_BOX</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use NEST_BOX</td>
+</tr>
+<tr>
+<td><code>HAS_PLACE_OFFERING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use PLACE_OFFERING</td>
+</tr>
+<tr>
+<td><code>HAS_PROTECT_FOLDED_SHEETS</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use PROTECT_FOLDED_SHEETS</td>
+</tr>
+<tr>
+<td><code>HAS_ROLL_UP_SHEET</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use ROLL_UP_SHEET</td>
+</tr>
+<tr>
+<td><code>HAS_SMALL_OBJECT_STORAGE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use SMALL_OBJECT_STORAGE</td>
+</tr>
+<tr>
+<td><code>HAS_STAND_AND_WORK_ABOVE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use STAND_AND_WORK_ABOVE</td>
+</tr>
+<tr>
+<td><code>HAS_TRACK_CART</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>tool use TRACK_CART</td>
+</tr>
+<tr>
+<td><code>HATCH_COVER</code></td>
+<td>HATCH_COVER</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>HEADWEAR_ANY</code></td>
+<td>HELM</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>HELM</code></td>
+<td>HELM</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_HELM_HELM</code></td>
+</tr>
+<tr>
+<td><code>HELVE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_HELVE</code></td>
+</tr>
+<tr>
+<td><code>HIVE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_HIVE</code></td>
+</tr>
+<tr>
+<td><code>HONEYCOMB</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_HONEYCOMB</code></td>
+</tr>
+<tr>
+<td><code>HOOD</code></td>
+<td>HELM</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_HELM_HOOD</code></td>
+</tr>
+<tr>
+<td><code>INSTRUMENT</code></td>
+<td>INSTRUMENT</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>JUG</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_JUG</code></td>
+</tr>
+<tr>
+<td><code>KNIFE_BONING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_KNIFE_BONING</code></td>
+</tr>
+<tr>
+<td><code>KNIFE_CARVING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_KNIFE_CARVING</code></td>
+</tr>
+<tr>
+<td><code>KNIFE_MEAT_CLEAVER</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_MEAT_CLEAVER</code></td>
+</tr>
+<tr>
+<td><code>KNIFE_SLICING</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_KNIFE_SLICING</code></td>
+</tr>
+<tr>
+<td><code>LADLE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_LADLE</code></td>
+</tr>
+<tr>
+<td><code>LARGESERRATEDDISC</code></td>
+<td>TRAPCOMP</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TRAPCOMP_LARGESERRATEDDISC</code></td>
+</tr>
+<tr>
+<td><code>LARGE_POT</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_LARGE_POT</code></td>
+</tr>
+<tr>
+<td><code>LEATHER_ARMOR</code></td>
+<td>ARMOR</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_ARMOR_LEATHER_ARMOR</code></td>
+</tr>
+<tr>
+<td><code>LEGGINGS</code></td>
+<td>PANTS</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_PANTS_LEGGINGS</code></td>
+</tr>
+<tr>
+<td><code>LEGWEAR_ANY</code></td>
+<td>PANTS</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>LIQUID_INORGANIC_ANY</code></td>
+<td>LIQUID_MISC</td>
+<td>inorganic</td>
+<td></td>
+</tr>
+<tr>
+<td><code>LIQUID_INORGANIC</code></td>
+<td>LIQUID_MISC</td>
+<td>inorganic</td>
+<td><code>mat_id</code> or <code>mat_token</code></td>
+</tr>
+<tr>
+<td><code>LIQUID_MISC</code></td>
+<td>LIQUID_MISC</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>LIQUID</code></td>
+<td>LIQUID_MISC</td>
+<td>nil</td>
+<td></td>
+</tr>
+<tr>
+<td><code>LOINCLOTH</code></td>
+<td>PANTS</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_PANTS_LOINCLOTH</code></td>
+</tr>
+<tr>
+<td><code>LYE</code></td>
+<td>LIQUID_MISC</td>
+<td>builtin LYE</td>
+<td></td>
+</tr>
+<tr>
+<td><code>MACE</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_MACE</code></td>
+</tr>
+<tr>
+<td><code>MAIL_SHIRT</code></td>
+<td>ARMOR</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_ARMOR_MAIL_SHIRT</code></td>
+</tr>
+<tr>
+<td><code>MASK</code></td>
+<td>HELM</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_HELM_MASK</code></td>
+</tr>
+<tr>
+<td><code>MAUL</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_MAUL</code></td>
+</tr>
+<tr>
+<td><code>MEAT</code></td>
+<td>MEAT</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>MENACINGSPIKE</code></td>
+<td>TRAPCOMP</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TRAPCOMP_MENACINGSPIKE</code></td>
+</tr>
+<tr>
+<td><code>MILLSTONE</code></td>
+<td>MILLSTONE</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>MINECART</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_MINECART</code></td>
+</tr>
+<tr>
+<td><code>MITTENS</code></td>
+<td>GLOVES</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_GLOVES_MITTENS</code></td>
+</tr>
+<tr>
+<td><code>MORNINGSTAR</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_MORNINGSTAR</code></td>
+</tr>
+<tr>
+<td><code>MORTAR</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_MORTAR</code></td>
+</tr>
+<tr>
+<td><code>NEST_BOX</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_NEST_BOX</code></td>
+</tr>
+<tr>
+<td><code>ORE_OF</code></td>
+<td>BOULDER</td>
+<td>any</td>
+<td><code>metal_id</code></td>
+</tr>
+<tr>
+<td><code>ORTHOPEDIC_CAST</code></td>
+<td>ORTHOPEDIC_CAST</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>PANTS</code></td>
+<td>PANTS</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>PEDESTAL</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_PEDESTAL</code></td>
+</tr>
+<tr>
+<td><code>PESTLE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_PESTLE</code></td>
+</tr>
+<tr>
+<td><code>PET</code></td>
+<td>PET</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>PICK_GREAT</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_PICK_GREAT</code></td>
+</tr>
+<tr>
+<td><code>PICK</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_PICK</code></td>
+</tr>
+<tr>
+<td><code>PIKE</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_PIKE</code></td>
+</tr>
+<tr>
+<td><code>PIPE_SECTION</code></td>
+<td>PIPE_SECTION</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>PLANT_GROWTH</code></td>
+<td>PLANT_GROWTH</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>PLANT</code></td>
+<td>PLANT</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>POUCH</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_POUCH</code></td>
+</tr>
+<tr>
+<td><code>POWDER_ANY</code></td>
+<td>POWDER_MISC</td>
+<td>inorganic</td>
+<td></td>
+</tr>
+<tr>
+<td><code>POWDER</code></td>
+<td>POWDER_MISC</td>
+<td>nil</td>
+<td></td>
+</tr>
+<tr>
+<td><code>QUERN</code></td>
+<td>QUERN</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>QUIRE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_QUIRE</code></td>
+</tr>
+<tr>
+<td><code>QUIVER</code></td>
+<td>QUIVER</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>REMAINS</code></td>
+<td>REMAINS</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>RING</code></td>
+<td>RING</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ROBE</code></td>
+<td>ARMOR</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_ARMOR_ROBE</code></td>
+</tr>
+<tr>
+<td><code>ROCK_ANY</code></td>
+<td>ROCK</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ROCK</code></td>
+<td>ROCK</td>
+<td>inorganic</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ROUGH_ANY</code></td>
+<td>ROUGH</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ROUGH</code></td>
+<td>ROUGH</td>
+<td>inorganic</td>
+<td><code>mat_id</code> or <code>mat_token</code></td>
+</tr>
+<tr>
+<td><code>SANDAL</code></td>
+<td>SHOES</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_SHOES_SANDAL</code></td>
+</tr>
+<tr>
+<td><code>SCARF_HEAD</code></td>
+<td>HELM</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_HELM_SCARF_HEAD</code></td>
+</tr>
+<tr>
+<td><code>SCEPTER</code></td>
+<td>SCEPTER</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>SCIMITAR</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_SCIMITAR</code></td>
+</tr>
+<tr>
+<td><code>SCOURGE</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_SCOURGE</code></td>
+</tr>
+<tr>
+<td><code>SCROLL_ROLLERS</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_SCROLL_ROLLERS</code></td>
+</tr>
+<tr>
+<td><code>SCROLL</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_SCROLL</code></td>
+</tr>
+<tr>
+<td><code>SEEDS</code></td>
+<td>SEEDS</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>SHEET</code></td>
+<td>SHEET</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>SHIELD_ANY</code></td>
+<td>SHIELD</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>SHIELD_BUCKLER</code></td>
+<td>SHIELD</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_SHIELD_BUCKLER</code></td>
+</tr>
+<tr>
+<td><code>SHIELD</code></td>
+<td>SHIELD</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_SHIELD_SHIELD</code></td>
+</tr>
+<tr>
+<td><code>SHIRT</code></td>
+<td>ARMOR</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_ARMOR_SHIRT</code></td>
+</tr>
+<tr>
+<td><code>SHOES</code></td>
+<td>SHOES</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>SIEGEAMMO_BALLISTA</code></td>
+<td>SIEGEAMMO</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_SIEGEAMMO_BALLISTA</code></td>
+</tr>
+<tr>
+<td><code>SIEGEAMMO</code></td>
+<td>SIEGEAMMO</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>SKIN_TANNED</code></td>
+<td>SKIN_TANNED</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>SKIRT_LONG</code></td>
+<td>PANTS</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_PANTS_SKIRT_LONG</code></td>
+</tr>
+<tr>
+<td><code>SKIRT_SHORT</code></td>
+<td>PANTS</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_PANTS_SKIRT_SHORT</code></td>
+</tr>
+<tr>
+<td><code>SKIRT</code></td>
+<td>PANTS</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_PANTS_SKIRT</code></td>
+</tr>
+<tr>
+<td><code>SLAB</code></td>
+<td>SLAB</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>SMALLGEM_ANY</code></td>
+<td>SMALLGEM</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>SMALLGEM</code></td>
+<td>SMALLGEM</td>
+<td>inorganic</td>
+<td><code>mat_id</code> or <code>mat_token</code></td>
+</tr>
+<tr>
+<td><code>SOCKS</code></td>
+<td>SHOES</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_SHOES_SOCKS</code></td>
+</tr>
+<tr>
+<td><code>SPEAR_TRAINING</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_SPEAR_TRAINING</code></td>
+</tr>
+<tr>
+<td><code>SPEAR</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_SPEAR</code></td>
+</tr>
+<tr>
+<td><code>SPIKEDBALL</code></td>
+<td>TRAPCOMP</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TRAPCOMP_SPIKEDBALL</code></td>
+</tr>
+<tr>
+<td><code>SPLINT</code></td>
+<td>SPLINT</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>STATUE</code></td>
+<td>STATUE</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>STEPLADDER</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_STEPLADDER</code></td>
+</tr>
+<tr>
+<td><code>STONE_AXE</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_STONE_AXE</code></td>
+</tr>
+<tr>
+<td><code>SWORD_2H</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_SWORD_2H</code></td>
+</tr>
+<tr>
+<td><code>SWORD_LONG</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_SWORD_LONG</code></td>
+</tr>
+<tr>
+<td><code>SWORD_SHORT_TRAINING</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_SWORD_SHORT_TRAINING</code></td>
+</tr>
+<tr>
+<td><code>SWORD_SHORT</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_SWORD_SHORT</code></td>
+</tr>
+<tr>
+<td><code>TABLE</code></td>
+<td>TABLE</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>THONG</code></td>
+<td>PANTS</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_PANTS_THONG</code></td>
+</tr>
+<tr>
+<td><code>THREAD</code></td>
+<td>THREAD</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>TOGA</code></td>
+<td>ARMOR</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_ARMOR_TOGA</code></td>
+</tr>
+<tr>
+<td><code>TOOL</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td><code>tool_id</code></td>
+</tr>
+<tr>
+<td><code>TOTEM</code></td>
+<td>TOTEM</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>TOY_AXE</code></td>
+<td>TOY</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>TOY_BOAT</code></td>
+<td>TOY</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>TOY_HAMMER</code></td>
+<td>TOY</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>TOY_MINIFORGE</code></td>
+<td>TOY</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>TOY_PUZZLEBOX</code></td>
+<td>TOY</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>TOY</code></td>
+<td>TOY</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>TRACTION_BENCH</code></td>
+<td>TRACTION_BENCH</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>TRAPCOMP</code></td>
+<td>TRAPCOMP</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>TRAPPARTS</code></td>
+<td>TRAPPARTS</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>TUNIC</code></td>
+<td>ARMOR</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_ARMOR_TUNIC</code></td>
+</tr>
+<tr>
+<td><code>TURBAN</code></td>
+<td>HELM</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_HELM_TURBAN</code></td>
+</tr>
+<tr>
+<td><code>VEIL_FACE</code></td>
+<td>HELM</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_HELM_VEIL_FACE</code></td>
+</tr>
+<tr>
+<td><code>VEIL_HEAD</code></td>
+<td>HELM</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_HELM_VEIL_HEAD</code></td>
+</tr>
+<tr>
+<td><code>VEST</code></td>
+<td>ARMOR</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_ARMOR_VEST</code></td>
+</tr>
+<tr>
+<td><code>WATER</code></td>
+<td>LIQUID_MISC</td>
+<td>builtin 6</td>
+<td></td>
+</tr>
+<tr>
+<td><code>WEAPONRACK</code></td>
+<td>WEAPONRACK</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>WEAPON</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>WHEELBARROW</code></td>
+<td>TOOL</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_TOOL_WHEELBARROW</code></td>
+</tr>
+<tr>
+<td><code>WHIP</code></td>
+<td>WEAPON</td>
+<td>any</td>
+<td>item_subtype <code>ITEM_WEAPON_WHIP</code></td>
+</tr>
+<tr>
+<td><code>WINDOW</code></td>
+<td>WINDOW</td>
+<td>any</td>
+<td></td>
+</tr>
+<tr>
+<td><code>WOOD</code></td>
+<td>WOOD</td>
+<td>any</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+</section>
+<section class="chapter"><h2 id="appendix-b" data-num="B"><a class="anchor" href="#appendix-b" aria-label="Link to this section">#</a><span class="h-num">B</span><span class="h-text">Vectors and tool uses</span></h2>
+<p><code>vector_id</code> names (<code>JOB_ITEM_VECTORS</code>): <code>ANY</code>, <code>IN_PLAY</code>, <code>ANY_ARTIFACT</code>, <code>WEAPON</code>, <code>ANY_WEAPON</code>, <code>ANY_SPIKE</code>, <code>ANY_TRUE_ARMOR</code>, <code>ANY_ARMOR_HELM</code>, <code>ANY_ARMOR_SHOES</code>, <code>SHIELD</code>, <code>ANY_ARMOR_GLOVES</code>, <code>ANY_ARMOR_PANTS</code>, <code>QUIVER</code>, <code>SPLINT</code>, <code>ORTHOPEDIC_CAST</code>, <code>CRUTCH</code>, <code>BACKPACK</code>, <code>AMMO</code>, <code>WOOD</code>, <code>BOULDER</code>, <code>ROCK</code>, <code>ANY_REFUSE</code>, <code>ANY_GOOD_FOOD</code>, <code>ANY_AUTO_CLEAN</code>, <code>ANY_EXTRACTABLE</code>, <code>ANY_BUTCHERABLE</code>, <code>ANY_FURNITURE</code>, <code>ANY_CAGE_OR_TRAP</code>, <code>ANY_EDIBLE_RAW</code>, <code>ANY_EDIBLE_CARNIVORE</code>, <code>ANY_EDIBLE_BONECARN</code>, <code>ANY_EDIBLE_VERMIN</code>, <code>ANY_EDIBLE_VERMIN_BOX</code>, <code>ANY_CAN_ROT</code>, <code>ANY_MURDERED</code>, <code>ANY_DEAD_DWARF</code>, <code>ANY_GOES_IN_CHEST</code>, <code>ANY_GOES_IN_CABINET</code>, <code>ANY_GOES_IN_WEAPONRACK</code>, <code>ANY_GOES_IN_ARMORSTAND</code>, <code>DOOR</code>, <code>FLOODGATE</code>, <code>HATCH_COVER</code>, <code>GRATE</code>, <code>CAGE</code>, <code>FLASK</code>, <code>WINDOW</code>, <code>GOBLET</code>, <code>INSTRUMENT</code>, <code>TOY</code>, <code>BUCKET</code>, <code>BARREL</code>, <code>CHAIN</code>, <code>ANIMALTRAP</code>, <code>BED</code>, <code>TRACTION_BENCH</code>, <code>CHAIR</code>, <code>COFFIN</code>, <code>TABLE</code>, <code>STATUE</code>, <code>QUERN</code>, <code>MILLSTONE</code>, <code>BOX</code>, <code>BIN</code>, <code>ARMORSTAND</code>, <code>WEAPONRACK</code>, <code>CABINET</code>, <code>ANVIL</code>, <code>CATAPULTPARTS</code>, <code>BALLISTAPARTS</code>, <code>SIEGEAMMO</code>, <code>TRAPPARTS</code>, <code>ANY_WEBS</code>, <code>PIPE_SECTION</code>, <code>ANY_ENCASED</code>, <code>ANY_IN_CONSTRUCTION</code>, <code>DRINK</code>, <code>ANY_DRINK</code>, <code>LIQUID_MISC</code>, <code>POWDER_MISC</code>, <code>ANY_COOKABLE</code>, <code>ANY_GLASSABLE</code>, <code>VERMIN</code>, <code>PET</code>, <code>ANY_CRITTER</code>, <code>COIN</code>, <code>GLOB</code>, <code>ANY_RECENTLY_DROPPED</code>, <code>ANY_MELT_DESIGNATED</code>, <code>TRAPCOMP</code>, <code>BAR</code>, <code>SMALLGEM</code>, <code>BLOCKS</code>, <code>ROUGH</code>, <code>CORPSE</code>, <code>FIGURINE</code>, <code>AMULET</code>, <code>SCEPTER</code>, <code>CROWN</code>, <code>RING</code>, <code>EARRING</code>, <code>BRACELET</code>, <code>GEM</code>, <code>CORPSEPIECE</code>, <code>REMAINS</code>, <code>MEAT</code>, <code>FISH</code>, <code>FISH_RAW</code>, <code>SEEDS</code>, <code>PLANT</code>, <code>SKIN_TANNED</code>, <code>PLANT_GROWTH</code>, <code>THREAD</code>, <code>CLOTH</code>, <code>TOTEM</code>, <code>PANTS</code>, <code>CHEESE</code>, <code>FOOD</code>, <code>BALLISTAARROWHEAD</code>, <code>ARMOR</code>, <code>SHOES</code>, <code>HELM</code>, <code>GLOVES</code>, <code>TOOL</code>, <code>SLAB</code>, <code>EGG</code>, <code>POSSIBLE_CONTAINER</code>, <code>ANY_CORPSE</code>, <code>BOOK</code>, <code>FOOD_STORAGE</code>, <code>INSTRUMENT_STATIONARY</code>, <code>SHEET</code>, <code>BRANCH</code>, <code>BAG</code>, <code>MAGICAL</code>, <code>BOLT_THROWER_PARTS</code>.</p>
+<p><code>has_tool_use</code> and <code>tool_use</code> names (<code>TOOL_USES</code>): <code>NONE</code>, <code>LIQUID_COOKING</code>, <code>LIQUID_SCOOP</code>, <code>GRIND_POWDER_RECEPTACLE</code>, <code>GRIND_POWDER_GRINDER</code>, <code>MEAT_CARVING</code>, <code>MEAT_BONING</code>, <code>MEAT_SLICING</code>, <code>MEAT_CLEAVING</code>, <code>HOLD_MEAT_FOR_CARVING</code>, <code>MEAL_CONTAINER</code>, <code>LIQUID_CONTAINER</code>, <code>FOOD_STORAGE</code>, <code>HIVE</code>, <code>NEST_BOX</code>, <code>SMALL_OBJECT_STORAGE</code>, <code>TRACK_CART</code>, <code>HEAVY_OBJECT_HAULING</code>, <code>STAND_AND_WORK_ABOVE</code>, <code>ROLL_UP_SHEET</code>, <code>PROTECT_FOLDED_SHEETS</code>, <code>CONTAIN_WRITING</code>, <code>BOOKCASE</code>, <code>DISPLAY_OBJECT</code>, <code>PLACE_OFFERING</code>, <code>DIVINATION</code>, <code>GAMES_OF_CHANCE</code>.</p>
+</section>
+  </article>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var doc      = document.getElementById('doc');
+  var search   = document.getElementById('search');
+  var hits     = document.getElementById('hits');
+  var rail     = document.getElementById('rail');
+  var navLinks = Array.prototype.slice.call(
+                   document.querySelectorAll('.rail-nav a'));
+  var chapters = Array.prototype.slice.call(
+                   document.querySelectorAll('.chapter'));
+
+  /* ---------- SCROLL SPY ----------
+     Highlights the deepest heading currently at or above the reading
+     line, so the rail always shows where you are.
+
+     headings MUST be re-queried after any innerHTML rebuild. The filter
+     replaces whole chapters, which detaches the old heading nodes, and a
+     detached node reports offsetTop 0 -- every heading then compares as
+     "above the line" and the spy locks onto the last section forever. */
+  var headings = [];
+
+  function refreshHeadings() {
+    headings = Array.prototype.slice.call(doc.querySelectorAll('h2, h3'))
+                 .filter(function (h) { return h.id; });
+  }
+  refreshHeadings();
+
+  function spy() {
+    if (search.value) return;
+    var line = window.scrollY + 120;
+    var current = null;
+    for (var i = 0; i < headings.length; i++) {
+      if (headings[i].offsetTop <= line) current = headings[i].id;
+      else break;
+    }
+    navLinks.forEach(function (a) {
+      a.classList.toggle('active', a.dataset.target === current);
+    });
+  }
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () { spy(); ticking = false; });
+  }, { passive: true });
+  spy();
+
+  /* ---------- FILTER ----------
+     Hides whole chapters that do not match and marks every hit inside
+     the ones that do. Restores the original markup on clear, so the
+     document is never permanently altered. */
+  var originals = chapters.map(function (c) { return c.innerHTML; });
+
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  function clearFilter() {
+    chapters.forEach(function (c, i) {
+      c.innerHTML = originals[i];
+      c.classList.remove('hidden');
+    });
+    navLinks.forEach(function (a) { a.classList.remove('dim'); });
+    hits.textContent = '';
+    refreshHeadings();
+    wireCopy();
+    spy();
+  }
+
+  function applyFilter(term) {
+    var re = new RegExp(escapeRe(term), 'gi');
+    var shown = 0, total = 0;
+    var visibleIds = {};
+
+    chapters.forEach(function (c, i) {
+      c.innerHTML = originals[i];
+      var text = c.textContent;
+      var found = text.match(re);
+      if (!found) {
+        c.classList.add('hidden');
+        return;
+      }
+      c.classList.remove('hidden');
+      shown++;
+      total += found.length;
+      highlight(c, re);
+      Array.prototype.forEach.call(c.querySelectorAll('h2, h3'),
+        function (h) { visibleIds[h.id] = true; });
+    });
+
+    navLinks.forEach(function (a) {
+      a.classList.remove('active');
+      a.classList.toggle('dim', !visibleIds[a.dataset.target]);
+    });
+
+    hits.textContent = total
+      ? total + ' match' + (total === 1 ? '' : 'es') +
+        ' in ' + shown + ' section' + (shown === 1 ? '' : 's')
+      : 'No matches';
+    refreshHeadings();
+    wireCopy();
+  }
+
+  /* Walks text nodes only, so highlighting can never break markup. */
+  function highlight(root, re) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    var nodes = [], n;
+    while ((n = walker.nextNode())) {
+      if (n.parentNode.nodeName === 'BUTTON') continue;
+      if (re.test(n.nodeValue)) nodes.push(n);
+      re.lastIndex = 0;
+    }
+    nodes.forEach(function (node) {
+      var span = document.createElement('span');
+      span.innerHTML = node.nodeValue.replace(/[&<>]/g, function (ch) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch];
+      }).replace(re, '<mark>$&</mark>');
+      node.parentNode.replaceChild(span, node);
+    });
+  }
+
+  var timer;
+  search.addEventListener('input', function () {
+    clearTimeout(timer);
+    var term = search.value.trim();
+    timer = setTimeout(function () {
+      if (term.length < 2) clearFilter();
+      else applyFilter(term);
+    }, 120);
+  });
+
+  /* ---------- KEYBOARD ---------- */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === '/' && document.activeElement !== search) {
+      e.preventDefault();
+      search.focus();
+      search.select();
+    } else if (e.key === 'Escape' && document.activeElement === search) {
+      search.value = '';
+      clearFilter();
+      search.blur();
+    }
+  });
+
+  /* ---------- COPY BUTTONS ---------- */
+  function wireCopy() {
+    Array.prototype.forEach.call(doc.querySelectorAll('.copy'),
+      function (btn) {
+        if (btn.dataset.wired) return;
+        btn.dataset.wired = '1';
+        btn.addEventListener('click', function () {
+          var code = btn.parentNode.querySelector('code');
+          var text = code ? code.textContent : '';
+          var done = function () {
+            btn.textContent = 'copied';
+            btn.classList.add('done');
+            setTimeout(function () {
+              btn.textContent = 'copy';
+              btn.classList.remove('done');
+            }, 1400);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done, fallback);
+          } else fallback();
+
+          function fallback() {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); done(); } catch (err) {}
+            document.body.removeChild(ta);
+          }
+        });
+      });
+  }
+  wireCopy();
+
+  /* ---------- THEME ----------
+     Session-only. No storage, so the file stays inert on disk. */
+  var themeBtn = document.getElementById('themeBtn');
+  themeBtn.addEventListener('click', function () {
+    var dark = document.documentElement.dataset.theme === 'dark';
+    document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+    themeBtn.textContent = dark ? 'Dark' : 'Light';
+  });
+
+  /* ---------- MOBILE RAIL ---------- */
+  var toggle = document.getElementById('railToggle');
+  toggle.addEventListener('click', function () { rail.classList.toggle('open'); });
+  rail.addEventListener('click', function (e) {
+    if (e.target.closest('a')) rail.classList.remove('open');
+  });
+})();
+</script>
+</body>
+</html>

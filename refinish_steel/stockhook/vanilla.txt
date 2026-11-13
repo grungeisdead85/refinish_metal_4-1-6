@@ -1,0 +1,87 @@
+Stockhook's own definitions: rows that split DF's own stockpile entries.
+These go in RM's mod folder, stockhook/vanilla.txt, so their ids are
+REFINISH_STEEL:COKE, REFINISH_STEEL:CHARCOAL, REFINISH_STEEL:REFINED_COAL,
+and the generated REFINISH_STEEL:TOOL_<tool id> and
+REFINISH_STEEL:WOOD_<plant id>_<list>.
+
+TOOL KINDS. Every tool kind in the world, vanilla or modded, as an item type
+of its own in the list DF files it under. Most sit beside Tools in Finished
+goods: type (Bowls, Jugs, Hives, Quires, a mod's sawdust or kindling...), a
+part of Tools, which is then shown as "Tools (all)". Furniture tools sit
+beside Other large tools in Furniture: type (Stepladders, Bookcases,
+Pedestals, Display cases, Altars, any modded FURNITURE tool), a part of it,
+shown as "Other large tools (all)". Materials are chosen in the pile's
+ordinary material lists. A tool kind some other file names itself is left
+to that file. Left out: minecarts, wheelbarrows and large pots, which have
+Furniture entries of their own, and the instrument pieces each world
+generates for itself.
+
+[STOCKHOOK_GENERATE:TOOL_TYPES]
+
+ITEM KINDS. The kinds of an item type a list shows only as a whole, as rows
+of their own beside it. Finished goods: type lists clothing by slot ("Body
+wear", "Headwear" ...) where the Armor group lists every kind, and Toys as
+one row; each clothing kind gets a row (Coats, Robes ... as parts of
+"Armor (all)"). Armor kinds (an ARMORLEVEL above 0) get none: Finished
+goods never takes them, whatever they are made of. Refuse: items lists Tools, Weapons, Armor and the rest
+as one row each; each gets a row per kind, so a refuse pile can take worn
+clothing and leave worn armor, say. Which items go to refuse at all stays
+DF's own rule. A type with fewer than two kinds gets no rows.
+
+[STOCKHOOK_GENERATE:ITEM_KINDS]
+
+CLOTHING OUT OF ARMOR. The Armor group lists every kind of body wear,
+headwear, footwear, handwear and legwear, clothing included, but DF refuses
+clothing there whatever it is made of (metal robes and metal masks go to
+Finished goods). So every kind with no armor level has its row hidden in
+Armor. Kept: a kind DF still files as armor in some material. A cap is
+clothing, but a metal cap goes to armor, so Caps stays.
+
+[STOCKHOOK_GENERATE:ARMOR_CLOTHING]
+[STOCKHOOK_ARMOR_KEEP:HELM:ITEM_HELM_CAP]
+
+TREES. Every tree, vanilla or modded, as a material of its own beside Wood
+in each list with a Wood entry: finished goods, furniture, blocks, ammo,
+weapons and armor. Each is a part of that list's Wood entry, for that
+list's own item types only, so Oak in Furniture and Oak in Finished goods
+are separate switches.
+
+[STOCKHOOK_GENERATE:WOODS]
+
+COAL. DF's coal bars are of builtin material COAL, told apart by mat_index:
+0 coke, 1 charcoal, -1 refined coal (vanilla reaction_smelter.txt makes
+BAR:NO_SUBTYPE:COAL:COKE; refined coal is what a coal bar with no index is,
+made by mods). Each gets its own row beside the vanilla Coal row, in Bars:
+other materials. MATERIAL:COAL:NONE names mat_index -1 itself, not every
+coal. The vanilla Coal row stays the wildcard: it decides every coal no row
+here claims (a mod's own coal materials, for example), and clicking it sets
+all three rows. Each row starts, in every existing pile, at that pile's
+Coal setting. VANILLA_ITEM: DF itself files these bars under Coal, so the
+pile's other settings still apply to them.
+
+[STOCKHOOK_ENTRY:COKE]
+    [LABEL:Coke]
+    [CATEGORY:BARS_OTHER]
+    [CONTAINER:BIN]
+    [ITEM:BAR]
+    [MATERIAL:COAL:COKE]
+    [PART_OF:BARS:COAL]
+    [VANILLA_ITEM]
+
+[STOCKHOOK_ENTRY:CHARCOAL]
+    [LABEL:Charcoal]
+    [CATEGORY:BARS_OTHER]
+    [CONTAINER:BIN]
+    [ITEM:BAR]
+    [MATERIAL:COAL:CHARCOAL]
+    [PART_OF:BARS:COAL]
+    [VANILLA_ITEM]
+
+[STOCKHOOK_ENTRY:REFINED_COAL]
+    [LABEL:Refined coal]
+    [CATEGORY:BARS_OTHER]
+    [CONTAINER:BIN]
+    [ITEM:BAR]
+    [MATERIAL:COAL:NONE]
+    [PART_OF:BARS:COAL]
+    [VANILLA_ITEM]

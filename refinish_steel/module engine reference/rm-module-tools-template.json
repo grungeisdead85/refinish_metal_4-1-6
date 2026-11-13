@@ -1,0 +1,127 @@
+{
+    "_README": [
+        "==========================================",
+        "RM MODULE TOOLS TEMPLATE",
+        "==========================================",
+        "This file defines the TOOLS your module injects: hollow item forms",
+        "whose material comes from whatever they are made of. Reactions take",
+        "a tool with a TOOL reagent's tool_id and make one with a product's",
+        "subtype, both naming its full ID.",
+        "",
+        "HOW TO USE THIS FILE:",
+        "  1. Copy it into your mod's data/ folder.",
+        "  2. Rename it to <yourmod>_tools.json.",
+        "  3. Change the module block below to your own prefix.",
+        "  4. Replace the tools array with your own content.",
+        "  5. Hand it to RM from your listener as tools_json, the way",
+        "     rm-module-template-advanced.lua hands over its files.",
+        "",
+        "THE UNDERSCORE CONVENTION:",
+        "  Any key starting with an underscore is documentation. RM's engine",
+        "  reads only the keys it knows about, so _README and _comment are",
+        "  ignored at load time. Keep them, edit them, or delete them.",
+        "",
+        "LEAVING A FIELD OUT:",
+        "  RM builds each tool as a new, empty itemdef. A field you leave out",
+        "  is not written, so it keeps that empty default. Nothing comes from",
+        "  another tool unless graphics names a donor.",
+        "",
+        "PREFIXING:",
+        "  You write key. The tool's ID is module.prefix .. key: key CRUCIBLE",
+        "  under prefix MYMOD_ becomes MYMOD_CRUCIBLE. Reactions name it by",
+        "  that full ID.",
+        "",
+        "VALIDATION:",
+        "  RM checks each tool on its own. A bad entry is left out and named",
+        "  in the log, and the rest are injected. A reaction whose product",
+        "  names a left-out tool by subtype is left out with it.",
+        "",
+        "CHECK RM'S CATALOG FIRST:",
+        "  RM already carries dust, gravel, heaps, sawdust, bark, scrap,",
+        "  cullet and crust. Ask for those with requires in your",
+        "  module block instead of defining your own (guide section 9).",
+        "",
+        "FULL FIELD DOCUMENTATION:",
+        "  RM_MODULE_ENGINE_README.md, section 7.1."
+    ],
+
+    "module": {
+        "_comment": "Identity block. prefix is required and must be the prefix your other files use: RM injects your tools under the module's prefix. name and depends_on are read from here only when the module has no materials or reactions file.",
+        "prefix": "RM_TEMPLATE_",
+        "name": "RM Module Template",
+        "version": "1.0",
+
+        "_comment_requires": "Optional. RM catalog forms your module uses (guide section 9). Gathered from every file's module block, so it may sit here or in any other.",
+        "requires": []
+    },
+
+    "tools": [
+
+        {
+            "_comment": "REFERENCE ENTRY. Every field the schema accepts. Copy this one when you want to see the whole surface, then delete the lines you do not need.",
+
+            "_comment_key": "Required. Uppercase, no spaces. The tool's ID is prefix + key.",
+            "key": "REFERENCE_CRUCIBLE",
+
+            "_comment_names": "name is required. name_plural is optional to RM, but preflight requires it and items read wrong without it. adjective is optional.",
+            "name": "crucible",
+            "name_plural": "crucibles",
+            "adjective": "",
+
+            "_comment_value": "Optional. The tool's base value.",
+            "value": 10,
+
+            "_comment_size": "Optional. size is the itemdef's size. material_size is the material it takes to make, 3 to a bar: RM's melting pays a melted tool back on it.",
+            "size": 600,
+            "material_size": 3,
+
+            "_comment_capacity": "Optional. What the tool holds as a container (the itemdef's container_capacity). 0 for a tool that holds nothing.",
+            "capacity": 0,
+
+            "_comment_tile": "Optional. ASCII mode only: the character code of the tool's tile. The graphical game draws the sprite from graphics below.",
+            "tile": 157,
+
+            "_comment_flags": "Optional. DF's tool flags by name, each true or false, as a tool raw declares them: furniture, inverted_tile, no_default_job, incomplete_item, unimprovable, no_default_improvements, hard_mat, metal_mat, soft_mat, stone_mat, wood_mat, sheet_mat, metal_weapon_mat. A name not in that list is ignored.",
+            "flags": {
+                "hard_mat": true,
+                "metal_mat": true,
+                "no_default_job": true
+            },
+
+            "_comment_tool_use": "Optional. df.tool_uses names (guide Appendix B). A HAS_<USE> reagent finds the tool by these. An unknown name is logged and skipped.",
+            "tool_use": ["LIQUID_CONTAINER"],
+
+            "_comment_graphics": "Optional. The tool's sprite. donor copies every sprite field of another tool, named as a source such as TOOL:ITEM_TOOL_JUG. fields writes named itemdef sprite fields (texpos_item, texpos_stone and the rest) one by one, each a source string or a table { donor, offset, fill }. Sources are listed in guide section 4.7; a FILE path is relative to your data folder. See the second entry for fields.",
+            "graphics": {
+                "donor": "TOOL:ITEM_TOOL_JUG"
+            },
+
+            "_comment_tint": "Optional. The name of art registered with refinish-sprite-art. RM then draws the tool from that art in each material's own colour. Leave it out and the sprite is drawn as DF draws it.",
+
+            "_comment_stack": "Optional, default false. True: when a reaction makes this tool, RM merges the new items into one stack per material.",
+            "stack": false
+        },
+
+        {
+            "_comment": "EXAMPLE. A stacking form drawn from your own sheet: column 0, row 0 of data/images/my_module_sheet.png, a sheet 4 tiles wide.",
+
+            "key": "FINES",
+            "name": "fines",
+            "name_plural": "fines",
+            "value": 1,
+            "size": 100,
+            "material_size": 1,
+            "capacity": 0,
+            "flags": {
+                "hard_mat": true,
+                "no_default_job": true
+            },
+            "graphics": {
+                "fields": {
+                    "texpos_item": "FILE:images/my_module_sheet.png:0:0:4"
+                }
+            },
+            "stack": true
+        }
+    ]
+}

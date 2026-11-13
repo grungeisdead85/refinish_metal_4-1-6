@@ -1,0 +1,162 @@
+{
+    "_README": [
+        "==========================================",
+        "RM MODULE BUILDINGS TEMPLATE",
+        "==========================================",
+        "This file defines the WORKSHOPS and FURNACES your module injects,",
+        "graphics included, with no raws.",
+        "",
+        "HOW TO USE THIS FILE:",
+        "  1. Copy it into your mod's data/ folder.",
+        "  2. Rename it to <yourmod>_buildings.json.",
+        "  3. Change the module block below to your own prefix.",
+        "  4. Replace the buildings array with your own content.",
+        "  5. Put its PNG sheets in data/images/.",
+        "  6. Hand it to RM from your listener as buildings_json, the way",
+        "     rm-module-template-advanced.lua hands over its files.",
+        "",
+        "THE UNDERSCORE CONVENTION:",
+        "  Any key starting with an underscore is documentation. RM's engine",
+        "  reads only the keys it knows about, so _README and _comment are",
+        "  ignored at load time. Keep them, edit them, or delete them.",
+        "",
+        "PREFIXING:",
+        "  You write key. Key KILNETTE under prefix MYMOD_ becomes the",
+        "  building MYMOD_KILNETTE.",
+        "",
+        "PUTTING REACTIONS IN IT:",
+        "  A reaction's building must be an entry in BUILDING_TYPES, in",
+        "  refinish-module-types.lua. For a building of your own, add one:",
+        "  type { 13 }, subtype { 23 } for a workshop, or type { 5 },",
+        "  subtype { 7 } for a furnace, with custom = { -1 } and custom_code",
+        "  set to the building's full ID (guide section 5.2).",
+        "",
+        "PERMISSIONS:",
+        "  None to write. RM permits every building carrying your prefix to",
+        "  every civilization, so it shows in the build menu.",
+        "",
+        "VALIDATION:",
+        "  RM's validator does not check this file. The building injector",
+        "  guards each building and logs what it could not do. Run preflight,",
+        "  which does check it.",
+        "",
+        "FULL FIELD DOCUMENTATION:",
+        "  RM_MODULE_ENGINE_README.md, section 7.3."
+    ],
+
+    "module": {
+        "_comment": "Identity block. Keep it the same as your other files. Its prefix becomes the module's prefix only when the module ships no materials, reactions or tools file.",
+        "prefix": "RM_TEMPLATE_",
+        "name": "RM Module Template",
+        "version": "1.0"
+    },
+
+    "buildings": [
+
+        {
+            "_comment": "REFERENCE ENTRY. Every field the schema accepts, with its default noted. Copy it, then delete the lines you do not need.",
+
+            "_comment_key": "Required. Uppercase, no spaces. The building's code is prefix + key.",
+            "key": "REFERENCE_KILN",
+
+            "_comment_name": "Default: the key. Preflight requires it.",
+            "name": "Reference kiln",
+
+            "_comment_class": "WORKSHOP or FURNACE. In game it defaults to WORKSHOP; preflight requires it written.",
+            "class": "FURNACE",
+
+            "_comment_dim": "Default [3, 3]. Width and height in tiles.",
+            "dim": [3, 3],
+
+            "_comment_workloc": "Default: the centre, [floor(width / 2), floor(height / 2)]. The tile the worker stands on, counted from 0. Preflight checks it lies inside dim.",
+            "workloc": [1, 1],
+
+            "_comment_block": "Optional. One row per tile of height, top to bottom, each with one entry per tile of width: 1 blocks the tile, 0 leaves it open. Preflight checks the shape against dim.",
+            "block": [
+                [0, 0, 0],
+                [0, 1, 0],
+                [0, 0, 0]
+            ],
+
+            "_comment_build_stages": "Default 3.",
+            "build_stages": 3,
+
+            "_comment_build_key": "Default 0, no key. The key that picks it in the build menu: a df.interface_key name such as CUSTOM_SHIFT_K, or a number. An unknown name is logged.",
+            "build_key": "CUSTOM_SHIFT_K",
+
+            "_comment_needs_magma": "Default false. True for a building that needs magma.",
+            "needs_magma": false,
+
+            "_comment_labors": "build_labors: the labors that may build it, default [\"MASON\"]. labor_description: optional text naming them.",
+            "build_labors": ["MASON"],
+            "labor_description": "Masonry",
+
+            "_comment_tooltip": "Optional. Lines of text, one string each.",
+            "tooltip": ["Fires small clay goods."],
+
+            "_comment_name_color": "Default [0, 7, 1]. The colour triple [foreground, background, brightness] DF keeps for the building's name.",
+            "name_color": [0, 7, 1],
+
+            "_comment_build_items": "What it is built from. Preflight requires at least one. Each item takes: type, a df.item_type name (NONE takes any item, narrowed by flags); subtype, a tool ID or a number, for a TOOL item; mat, a material token such as INORGANIC:IRON (one that does not resolve stops this building injecting, and the log says why); quantity, default 1; reaction_class; and flags1, flags2 and flags3, DF's job item flags by name, each true or false.",
+            "build_items": [
+                {
+                    "type": "NONE",
+                    "quantity": 1,
+                    "flags2": {
+                        "building_material": true,
+                        "fire_safe": true
+                    }
+                },
+                {
+                    "type": "BLOCKS",
+                    "quantity": 2,
+                    "mat": "INORGANIC:IRON"
+                },
+                {
+                    "type": "BARREL",
+                    "quantity": 1,
+                    "flags1": {
+                        "empty": true
+                    },
+                    "flags3": {
+                        "metal": true
+                    }
+                }
+            ],
+
+            "_comment_graphics": "Optional. image is the PNG, its path relative to your data folder; tile_dim is its tile size in pixels, default 32. The sheet holds the building in blocks of width x (height + 1) tiles. The first four blocks, left to right, are build stages 3, 2, 1 and 0. With overlay on (the default), four more blocks follow for the overlay layer. Default sheet size: 8 x width columns by height + 1 rows; set sheet_dim [columns, rows] when yours is laid out bigger, and origin [column, row] to start somewhere other than the top-left tile. A sheet whose tile count does not match is not used: the building injects without graphics, and the log gives both counts. The build menu icon is list_icon [column, row] on the same sheet, or icon_image, a separate PNG (icon_dim, its tile size, defaults to tile_dim); icon_image wins when both are set.",
+            "graphics": {
+                "image": "images/reference_kiln.png",
+                "tile_dim": 32,
+                "sheet_dim": [24, 4],
+                "origin": [0, 0],
+                "overlay": true,
+                "list_icon": [0, 0],
+                "icon_image": "images/reference_kiln_icon.png",
+                "icon_dim": 32
+            }
+        },
+
+        {
+            "_comment": "EXAMPLE. A 3x3 workshop built from any building material, with its graphics and a separate icon.",
+
+            "key": "KILNETTE",
+            "name": "Kilnette",
+            "class": "WORKSHOP",
+            "dim": [3, 3],
+            "build_items": [
+                {
+                    "type": "NONE",
+                    "quantity": 1,
+                    "flags2": {
+                        "building_material": true
+                    }
+                }
+            ],
+            "graphics": {
+                "image": "images/kilnette.png",
+                "icon_image": "images/kilnette_icon.png"
+            }
+        }
+    ]
+}

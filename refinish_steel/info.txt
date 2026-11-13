@@ -1,0 +1,52 @@
+[ID:refinish_steel]
+[NUMERIC_VERSION:35]
+[DISPLAYED_VERSION:4.1.6]
+[EARLIEST_COMPATIBLE_NUMERIC_VERSION:14]
+[EARLIEST_COMPATIBLE_DISPLAYED_VERSION:4.0.0]
+[AUTHOR:grungeisdead]
+[NAME:Refinish Metal]
+[DESCRIPTION:Refinish metal bars with dust from stone, metal and gems.]
+[STEAM_TITLE:Refinish Metal]
+
+[STEAM_TAG:mod]
+[STEAM_TAG:metal]
+[STEAM_TAG:material]
+[STEAM_TAG:inorganic]
+[STEAM_TAG:graphics]
+[STEAM_TAG:color]
+[STEAM_TAG:crafting]
+[STEAM_TAG:item]
+[STEAM_TAG:metallurgy]
+[STEAM_TAG:steel]
+[STEAM_TAG:smelting]
+[STEAM_TAG:rawless]
+[STEAM_TAG:utility]
+[STEAM_TAG:forge]
+[STEAM_TAG:gem]
+[STEAM_TAG:stone]
+[STEAM_TAG:dust]
+[STEAM_TAG:entity]
+[STEAM_TAG:ui]
+[STEAM_TAG:reaction]
+[STEAM_TAG:building]
+[STEAM_TAG:rawless]
+[STEAM_TAG:grind]
+[STEAM_TAG:utility]
+[STEAM_TAG:qol]
+[STEAM_TAG:compatibility]
+[STEAM_TAG:stockpile]
+
+[STEAM_DESCRIPTION:
+
+==========================================================
+CHANGELOG v4.1.6: v53.17 STOCKHOOK UPDATE
+==========================================================
+
+- Stockhook now supports DF 53.17.
+- Stockhook now verifies new DF builds itself and stays working through routine DF updates.
+- RM now warns at fort load when Stockhook can’t hook, so the player isn’t left to find out during play.
+- Fixed RM’s log not giving the reason when Stockhook couldn’t hook.
+
+]
+
+[STEAM_FILE_ID:3678145528]
